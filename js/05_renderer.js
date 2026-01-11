@@ -153,7 +153,7 @@
     const root = resolveCardRoot(cardRoot);
     const btn = root ? $role(root, "btn-play") : null;
     if (!btn) return;
-    btn.textContent = isPlaying ? "||" : ">";
+    btn.textContent = isPlaying ? "Pause" : "Play";
     btn.setAttribute("aria-pressed", isPlaying ? "true" : "false");
     btn.title = isPlaying ? "Pause preview" : "Play preview";
     btn.setAttribute("aria-label", isPlaying ? "Pause preview" : "Play preview");
