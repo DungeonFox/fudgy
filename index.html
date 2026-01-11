@@ -223,8 +223,8 @@ END README
             <div class="card-image__frame">
               <canvas data-role="preview-canvas" width="256" height="256"></canvas>
               <div class="row card-image__meta" style="justify-content:space-between;">
-                <div class="small muted">Frame: <span data-role="frame-info" class="mono"></span></div>
-                <div class="small muted">Size: <span data-role="size-info" class="mono"></span></div>
+                <div class="small muted"><span class="card-ui-html" data-ui-text>Frame:</span> <span data-role="frame-info" class="mono card-ui-html" data-ui-text></span></div>
+                <div class="small muted"><span class="card-ui-html" data-ui-text>Size:</span> <span data-role="size-info" class="mono card-ui-html" data-ui-text></span></div>
               </div>
             </div>
           </div>
@@ -236,7 +236,7 @@ END README
             <span class="card-ui-html">Template Editor <span class="mini" data-role="tpl-root-mini"></span></span>
             <span class="kbar">
               <input data-role="file-template" type="file" accept=".json,application/json" />
-              <button data-role="btn-save-template">Save template.json</button>
+              <button data-role="btn-save-template"><span class="card-ui-html" data-ui-text>Save template.json</span></button>
             </span>
           </h2>
           <div class="content" data-role="template-panel">
@@ -265,8 +265,8 @@ END README
               <div class="small muted">IDs are stable refs. Rects are shared across layers.</div>
             </div>
             <div class="row">
-              <button data-role="btn-add-rect">+ Rect</button>
-              <button data-role="btn-del-rect" class="danger">Delete Selected</button>
+              <button data-role="btn-add-rect"><span class="card-ui-html" data-ui-text>+ Rect</span></button>
+              <button data-role="btn-del-rect" class="danger"><span class="card-ui-html" data-ui-text>Delete Selected</span></button>
             </div>
           </div>
 
@@ -281,8 +281,8 @@ END README
               <div class="small muted">Recipe overrides are keyed by FrameSlot IDs.</div>
             </div>
             <div class="row">
-              <button data-role="btn-add-frame">+ FrameSlot</button>
-              <button data-role="btn-del-frame" class="danger">Delete Selected</button>
+              <button data-role="btn-add-frame"><span class="card-ui-html" data-ui-text>+ FrameSlot</span></button>
+              <button data-role="btn-del-frame" class="danger"><span class="card-ui-html" data-ui-text>Delete Selected</span></button>
             </div>
           </div>
 
@@ -298,7 +298,7 @@ END README
           <span class="card-ui-html">Animation Recipe Builder <span class="mini" data-role="rec-root-mini"></span></span>
           <span class="kbar">
             <input data-role="file-recipe" type="file" accept=".json,application/json" />
-            <button data-role="btn-save-recipe">Save animation.json</button>
+            <button data-role="btn-save-recipe"><span class="card-ui-html" data-ui-text>Save animation.json</span></button>
           </span>
         </h2>
         <div class="content" data-role="recipe-panel">
@@ -319,7 +319,7 @@ END README
             </div>
             <div class="row">
               <input data-role="file-asset" type="file" accept="image/*" multiple />
-              <button data-role="btn-add-asset">+ Empty Asset</button>
+              <button data-role="btn-add-asset"><span class="card-ui-html" data-ui-text>+ Empty Asset</span></button>
             </div>
           </div>
 
@@ -334,8 +334,8 @@ END README
               <div class="small muted">Each layer samples an Asset and draws a Rect, with per-frame overrides.</div>
             </div>
             <div class="row">
-              <button data-role="btn-add-layer">+ Layer</button>
-              <button data-role="btn-del-layer" class="danger">Delete Selected</button>
+              <button data-role="btn-add-layer"><span class="card-ui-html" data-ui-text>+ Layer</span></button>
+              <button data-role="btn-del-layer" class="danger"><span class="card-ui-html" data-ui-text>Delete Selected</span></button>
             </div>
           </div>
 
@@ -360,8 +360,8 @@ END README
         <span class="card-ui-html">Tasker Manager <span class="mini" data-role="task-root-mini"></span></span>
         <span class="kbar">
           <input data-role="file-tasker" type="file" accept=".json,application/json" />
-          <button data-role="btn-save-tasks">Save tasks.json</button>
-          <button data-role="btn-run-tasks" class="primary">Run Tasks</button>
+          <button data-role="btn-save-tasks"><span class="card-ui-html" data-ui-text>Save tasks.json</span></button>
+          <button data-role="btn-run-tasks" class="primary"><span class="card-ui-html" data-ui-text>Run Tasks</span></button>
         </span>
       </h2>
       <div class="content" data-role="task-panel">
@@ -371,8 +371,8 @@ END README
             <div class="small muted">Define tasks that control the pop‑out viewer.</div>
           </div>
           <div class="row">
-            <button data-role="btn-add-task">+ Task</button>
-            <button data-role="btn-del-task" class="danger">Delete Selected</button>
+            <button data-role="btn-add-task"><span class="card-ui-html" data-ui-text>+ Task</span></button>
+            <button data-role="btn-del-task" class="danger"><span class="card-ui-html" data-ui-text>Delete Selected</span></button>
           </div>
         </div>
         <div style="height:8px"></div>
@@ -387,7 +387,7 @@ END README
           <div style="height:6px"></div>
           <textarea data-role="task-commands-input" placeholder='[{"cmd":"play"}]'></textarea>
           <div class="row" style="margin-top:6px; justify-content:flex-end">
-            <button data-role="btn-update-task">Update Task</button>
+            <button data-role="btn-update-task"><span class="card-ui-html" data-ui-text>Update Task</span></button>
           </div>
         </div>
 
@@ -405,7 +405,7 @@ END README
             <input data-role="popout-left" type="number" step="10" style="width:70px" aria-label="Pop-out left" />
             <label style="font-size:11px">Top</label>
             <input data-role="popout-top" type="number" step="10" style="width:70px" aria-label="Pop-out top" />
-            <button data-role="popout-geometry-apply" class="primary">Apply</button>
+            <button data-role="popout-geometry-apply" class="primary"><span class="card-ui-html" data-ui-text>Apply</span></button>
           </div>
         </div>
           </div>

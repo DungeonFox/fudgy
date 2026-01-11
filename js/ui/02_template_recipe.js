@@ -22,7 +22,7 @@
     const head = document.createElement("div");
     head.className = "head";
     head.style.gridTemplateColumns = "140px 1fr 1fr 1fr 70px";
-    head.innerHTML = `<div>ID</div><div>Name</div><div>Source (sx,sy,sw,sh)</div><div>Dest (dx,dy,dw,dh)</div><div>Asset</div>`;
+    head.innerHTML = `<div>${wrapUiText("ID")}</div><div>${wrapUiText("Name")}</div><div>${wrapUiText("Source (sx,sy,sw,sh)")}</div><div>${wrapUiText("Dest (dx,dy,dw,dh)")}</div><div>${wrapUiText("Asset")}</div>`;
     rectList.appendChild(head);
 
     const rectIds = Array.isArray(tpl.rects) ? tpl.rects : [];
@@ -37,7 +37,7 @@
 
       const assetShort = (r.asset || "").split(":0x")[0] || "";
       item.innerHTML = `
-        <div class="mono">${rid}</div>
+        <div class="mono">${wrapUiText(rid)}</div>
         <div><input data-k="name" data-id="${rid}" type="text" value="${escapeHtml(r.name||"")}" /></div>
         <div class="row" style="gap:6px; flex-wrap:nowrap">
           ${numBox(rid,"sx",r.sx)} ${numBox(rid,"sy",r.sy)} ${numBox(rid,"sw",r.sw)} ${numBox(rid,"sh",r.sh)}
@@ -45,7 +45,7 @@
         <div class="row" style="gap:6px; flex-wrap:nowrap">
           ${numBox(rid,"dx",r.dx)} ${numBox(rid,"dy",r.dy)} ${numBox(rid,"dw",r.dw)} ${numBox(rid,"dh",r.dh)}
         </div>
-        <div class="mono">${assetShort}</div>
+        <div class="mono">${wrapUiText(assetShort)}</div>
       `;
       item.onclick = (ev) => run(() => {
         if (ev.target && (ev.target.tagName === "INPUT" || ev.target.tagName === "SELECT")) return;
@@ -62,7 +62,7 @@
     const head2 = document.createElement("div");
     head2.className = "head";
     head2.style.gridTemplateColumns = "140px 1fr 120px";
-    head2.innerHTML = `<div>ID</div><div>Name</div><div>Duration (ms)</div>`;
+    head2.innerHTML = `<div>${wrapUiText("ID")}</div><div>${wrapUiText("Name")}</div><div>${wrapUiText("Duration (ms)")}</div>`;
     frameList.appendChild(head2);
 
     const frameIds = Array.isArray(tpl.frames) ? tpl.frames : [];
@@ -75,7 +75,7 @@
       item.style.cursor = "pointer";
       if (fid === selectedFrameId) item.style.background = "rgba(93,214,193,0.10)";
       item.innerHTML = `
-        <div class="mono">${fid}</div>
+        <div class="mono">${wrapUiText(fid)}</div>
         <div><input data-k="name" data-id="${fid}" type="text" value="${escapeHtml(f.name||"")}" /></div>
         <div><input data-k="duration" data-id="${fid}" type="number" min="1" step="1" value="${Math.max(1,+f.duration||100)}" /></div>
       `;
@@ -117,7 +117,7 @@
     const head = document.createElement("div");
     head.className = "head";
     head.style.gridTemplateColumns = "140px 1fr 1fr 70px";
-    head.innerHTML = `<div>ID</div><div>Name</div><div>Src</div><div>Pick</div>`;
+    head.innerHTML = `<div>${wrapUiText("ID")}</div><div>${wrapUiText("Name")}</div><div>${wrapUiText("Src")}</div><div>${wrapUiText("Pick")}</div>`;
     assetList.appendChild(head);
 
     const assets = listNodesOfType("Asset").map(x => x.id).sort();
@@ -130,10 +130,10 @@
       if (aid === selectedAssetId) item.style.background = "rgba(93,214,193,0.10)";
       const srcShort = (a.src && a.src.startsWith("data:image/")) ? "data:image/…" : (a.src||"");
       item.innerHTML = `
-        <div class="mono">${aid}</div>
+        <div class="mono">${wrapUiText(aid)}</div>
         <div><input data-k="name" data-id="${aid}" type="text" value="${escapeHtml(a.name||"")}" /></div>
-        <div class="mono" title="${escapeHtml(a.src||"")}">${escapeHtml(srcShort)}</div>
-        <div><button data-pick-asset="${aid}">Select</button></div>
+        <div class="mono" title="${escapeHtml(a.src||"")}">${wrapUiText(srcShort)}</div>
+        <div><button data-pick-asset="${aid}">${wrapUiText("Select")}</button></div>
       `;
       item.onclick = (ev) => run(() => {
         if (ev.target && (ev.target.tagName === "INPUT" || ev.target.tagName === "BUTTON")) return;
@@ -150,7 +150,7 @@
     const head2 = document.createElement("div");
     head2.className = "head";
     head2.style.gridTemplateColumns = "140px 1fr 110px 110px 80px";
-    head2.innerHTML = `<div>ID</div><div>Name</div><div>Asset</div><div>Default Rect</div><div>Visible</div>`;
+    head2.innerHTML = `<div>${wrapUiText("ID")}</div><div>${wrapUiText("Name")}</div><div>${wrapUiText("Asset")}</div><div>${wrapUiText("Default Rect")}</div><div>${wrapUiText("Visible")}</div>`;
     layerList.appendChild(head2);
 
     const tpl = getNode(rec.template);
@@ -169,13 +169,13 @@
       const rectOpts = rectIds.slice();
 
       item.innerHTML = `
-        <div class="mono">${lid}</div>
+        <div class="mono">${wrapUiText(lid)}</div>
         <div><input data-k="name" data-id="${lid}" type="text" value="${escapeHtml(L.name||"")}" /></div>
         <div>${selectBox(lid,"asset",assetOpts, L.asset || "")}</div>
         <div>${selectBox(lid,"defaultRect",rectOpts, L.defaultRect || "")}</div>
         <div class="row" style="justify-content:space-between">
           <input data-k="visible" data-id="${lid}" type="checkbox" ${L.visible ? "checked":""} />
-          <span class="badge mono">${(L.opacity!==undefined)? clamp01(+L.opacity).toFixed(2) : "1.00"}</span>
+          <span class="badge mono">${wrapUiText((L.opacity!==undefined)? clamp01(+L.opacity).toFixed(2) : "1.00")}</span>
         </div>
       `;
 

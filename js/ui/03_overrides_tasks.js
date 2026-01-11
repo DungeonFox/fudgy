@@ -14,7 +14,7 @@
     if (!layer || layer.type !== "Layer"){
       const msg = document.createElement("div");
       msg.className = "item";
-      msg.textContent = "Select a layer to edit overrides.";
+      msg.innerHTML = wrapUiText("Select a layer to edit overrides.");
       box.appendChild(msg);
       return;
     }
@@ -25,7 +25,7 @@
     const head = document.createElement("div");
     head.className = "head";
     head.style.gridTemplateColumns = "140px 1fr 130px 70px 70px 90px 90px";
-    head.innerHTML = `<div>FrameSlot</div><div>Name</div><div>Rect</div><div>dx</div><div>dy</div><div>opacity</div><div>actions</div>`;
+    head.innerHTML = `<div>${wrapUiText("FrameSlot")}</div><div>${wrapUiText("Name")}</div><div>${wrapUiText("Rect")}</div><div>${wrapUiText("dx")}</div><div>${wrapUiText("dy")}</div><div>${wrapUiText("opacity")}</div><div>${wrapUiText("actions")}</div>`;
     box.appendChild(head);
 
     for (const fid of frameIds){
@@ -41,15 +41,15 @@
       const opVal = (ov && ov.opacity !== undefined) ? ov.opacity : "";
 
       item.innerHTML = `
-        <div class="mono">${fid}</div>
-        <div>${escapeHtml(f?.name || "")}</div>
+        <div class="mono">${wrapUiText(fid)}</div>
+        <div>${wrapUiText(f?.name || "")}</div>
         <div>${selectBox(`ov:${selectedLayerId}:${fid}`,"rect",["", ...rectIds], rectVal)}</div>
         <div><input data-ov="dx" data-l="${selectedLayerId}" data-f="${fid}" type="number" step="1" value="${escapeHtml(dxVal)}" /></div>
         <div><input data-ov="dy" data-l="${selectedLayerId}" data-f="${fid}" type="number" step="1" value="${escapeHtml(dyVal)}" /></div>
         <div><input data-ov="opacity" data-l="${selectedLayerId}" data-f="${fid}" type="number" step="0.05" min="0" max="1" value="${escapeHtml(opVal)}" /></div>
         <div class="row" style="gap:6px">
-          <button data-ov-set="${fid}">Set</button>
-          <button data-ov-clear="${fid}" class="danger">Clear</button>
+          <button data-ov-set="${fid}">${wrapUiText("Set")}</button>
+          <button data-ov-clear="${fid}" class="danger">${wrapUiText("Clear")}</button>
         </div>
       `;
       box.appendChild(item);
@@ -65,7 +65,7 @@
     const head = document.createElement("div");
     head.className = "head";
     head.style.gridTemplateColumns = "140px 1fr 90px";
-    head.innerHTML = `<div>ID</div><div>Name</div><div>#Cmds</div>`;
+    head.innerHTML = `<div>${wrapUiText("ID")}</div><div>${wrapUiText("Name")}</div><div>${wrapUiText("#Cmds")}</div>`;
     taskList.appendChild(head);
     const tasks = listNodesOfType("Task").map(x => x.id).sort();
     for (const tid of tasks){
@@ -77,9 +77,9 @@
       if (tid === selectedTaskId) item.style.background = "rgba(93,214,193,0.10)";
       const ncmd = Array.isArray(t.commands) ? t.commands.length : 0;
       item.innerHTML = `
-        <div class="mono">${tid}</div>
-        <div>${escapeHtml(t.name || "")}</div>
-        <div class="mono">${ncmd}</div>
+        <div class="mono">${wrapUiText(tid)}</div>
+        <div>${wrapUiText(t.name || "")}</div>
+        <div class="mono">${wrapUiText(String(ncmd))}</div>
       `;
       item.onclick = () => run(() => {
         selectedTaskId = tid;

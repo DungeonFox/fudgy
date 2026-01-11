@@ -14,11 +14,18 @@
     refreshTaskerUI(root);
     wireDynamicInputs(root); // re-bind dynamic inputs
     pushStateToPopout(false, root);
+    if (typeof window.updateCardUiSvg === "function") window.updateCardUiSvg(root);
   }
 
   function escapeHtml(s){
     s = String(s ?? "");
     return s.replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"','&quot;');
+  }
+
+  function wrapUiText(text, extraClass = ""){
+    const classes = ["card-ui-html"];
+    if (extraClass) classes.push(extraClass);
+    return `<span class="${classes.join(" ")}" data-ui-text>${escapeHtml(text)}</span>`;
   }
 
   function numBox(id, key, value){
