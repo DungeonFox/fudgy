@@ -12,6 +12,7 @@
   const validatedAtlases = new WeakSet();
   const UI_FALLBACK_KEY = "U003F";
   const UI_SPACE_KEY = "U0020";
+  let atlasLogged = false;
 
   function resolveRoot(cardRoot) {
     if (typeof resolveCardRoot === "function") return resolveCardRoot(cardRoot);
@@ -28,27 +29,89 @@
     }
   }
 
+  function getAtlasFormat(atlas) {
+    if (!atlas) return null;
+    if (atlas.format) return atlas.format;
+    if (atlas.meta && atlas.meta.format) return atlas.meta.format;
+    return null;
+  }
+
+  function atlasSignature(atlas) {
+    if (!atlas) return null;
+    return JSON.stringify({
+      format: getAtlasFormat(atlas),
+      font: atlas.font || null,
+      glyphs: atlas.glyphs || null
+    });
+  }
+
+  function logAtlasOnce(atlas) {
+    if (!atlas || atlasLogged) return;
+    atlasLogged = true;
+    if (!atlas.format && atlas.meta && atlas.meta.format) {
+      atlas.format = atlas.meta.format;
+    }
+    const glyphCount = atlas.glyphs ? Object.keys(atlas.glyphs).length : 0;
+    const glyphPath = atlas.glyphs && atlas.glyphs.U0041 && atlas.glyphs.U0041.svg
+      ? atlas.glyphs.U0041.svg.pathD
+      : undefined;
+    console.log("[card-ui-svg] Atlas loaded:", atlas.format, glyphCount, glyphPath);
+  }
+
   function loadUiAtlasOnce() {
     if (cachedAtlas) return Promise.resolve(cachedAtlas);
-    const existing = window.cardUiAtlas || window.CARD_UI_ATLAS || window.uiAtlas;
-    if (existing) {
-      cachedAtlas = existing;
-      return Promise.resolve(existing);
-    }
     if (atlasPromise) return atlasPromise;
 
     atlasPromise = new Promise((resolve) => {
+      const existing = window.cardUiAtlas || window.CARD_UI_ATLAS || window.uiAtlas;
       const script = document.getElementById("font-atlas");
       if (!script) {
+        if (existing) {
+          cachedAtlas = existing;
+          logAtlasOnce(existing);
+          resolve(existing);
+          return;
+        }
         resolve(null);
         return;
       }
       const inline = (script.textContent || "").trim();
       if (inline) {
         const parsed = parseAtlasJson(inline);
-        cachedAtlas = parsed;
-        if (parsed) window.cardUiAtlas = parsed;
-        resolve(parsed);
+        if (parsed && existing) {
+          if (atlasSignature(existing) !== atlasSignature(parsed)) {
+            console.warn("[card-ui-svg] Runtime atlas differs from inline #font-atlas JSON; replacing with provided atlas.");
+            cachedAtlas = parsed;
+            window.cardUiAtlas = parsed;
+            logAtlasOnce(parsed);
+            resolve(parsed);
+            return;
+          }
+          cachedAtlas = existing;
+          logAtlasOnce(existing);
+          resolve(existing);
+          return;
+        }
+        if (parsed) {
+          cachedAtlas = parsed;
+          window.cardUiAtlas = parsed;
+          logAtlasOnce(parsed);
+          resolve(parsed);
+          return;
+        }
+        if (existing) {
+          cachedAtlas = existing;
+          logAtlasOnce(existing);
+          resolve(existing);
+          return;
+        }
+        resolve(null);
+        return;
+      }
+      if (existing) {
+        cachedAtlas = existing;
+        logAtlasOnce(existing);
+        resolve(existing);
         return;
       }
       resolve(null);
