@@ -173,6 +173,13 @@
     opacity:0;
     pointer-events:none;
   }
+  .tcg-card__layout[data-ui-mode="svg"] input[type="file"].ui-file-input{
+    color:transparent;
+  }
+  .tcg-card__layout[data-ui-mode="svg"] input[type="file"].ui-file-input::file-selector-button,
+  .tcg-card__layout[data-ui-mode="svg"] input[type="file"].ui-file-input::-webkit-file-upload-button{
+    color:transparent;
+  }
   .card-header{
     grid-row:1;
     height: max(12px, var(--header-h, 0px));
