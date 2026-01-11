@@ -581,11 +581,15 @@ function cloneCardTemplate(){
         : (root.querySelector(".card-adjacent") || root);
       const panel = panelScope ? panelScope.querySelector(`[data-panel="${target}"]`) : null;
       if (!panel) return;
-      toggle.addEventListener("click", () => {
+      const onToggle = () => {
         const hidden = panel.classList.toggle("is-hidden");
         toggle.classList.toggle("is-active", !hidden);
         toggle.setAttribute("aria-pressed", hidden ? "false" : "true");
-      });
+      };
+      toggle.addEventListener("click", onToggle);
+      if (typeof registerUiAction === "function"){
+        registerUiAction(root, { actionKey: `toggle-${target}` }, onToggle);
+      }
     });
   }
 

@@ -4,8 +4,7 @@
     const run = (fn) => (typeof window.withCardRegistry === "function") ? window.withCardRegistry(root, fn) : fn();
     const btnAdd = root ? $role(root, "btn-add-rect") : null;
     const btnDel = root ? $role(root, "btn-del-rect") : null;
-    if (btnAdd){
-      btnAdd.onclick = () => run(() => {
+    const onAdd = () => run(() => {
         const tpl = getNode(registry.roots.template);
         if (!tpl || tpl.type !== "Template") return;
         // Use string concatenation for the name to avoid nested template literal syntax issues
@@ -20,9 +19,13 @@
         refreshAllUI(root);
         renderOnce(root);
       });
+    if (btnAdd){
+      btnAdd.onclick = onAdd;
     }
-    if (btnDel){
-      btnDel.onclick = () => run(() => {
+    if (typeof registerUiAction === "function"){
+      registerUiAction(root, { role: "btn-add-rect" }, onAdd);
+    }
+    const onDelete = () => run(() => {
         const tpl = getNode(registry.roots.template);
         if (!tpl || tpl.type !== "Template" || !selectedRectId) return;
         tpl.rects = (tpl.rects||[]).filter(x => x !== selectedRectId);
@@ -46,5 +49,10 @@
         refreshAllUI(root);
         renderOnce(root);
       });
+    if (btnDel){
+      btnDel.onclick = onDelete;
+    }
+    if (typeof registerUiAction === "function"){
+      registerUiAction(root, { role: "btn-del-rect" }, onDelete);
     }
   }
