@@ -149,6 +149,31 @@
     };
   }
 
+  function ensureUiSvgLayer(root) {
+    if (!root) return null;
+    const layout = root.querySelector(".tcg-card__layout");
+    if (!layout) return null;
+    const layoutSvg = layout.querySelector(".card-layout");
+    let svg = layout.querySelector('[data-role="card-ui-svg"]') || root.querySelector('[data-role="card-ui-svg"]');
+    if (!svg) {
+      svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.setAttribute("class", "card-ui-svg");
+      svg.setAttribute("data-role", "card-ui-svg");
+    }
+    if (svg.parentElement !== layout) {
+      layout.appendChild(svg);
+    }
+    const layoutViewBox = layoutSvg ? layoutSvg.getAttribute("viewBox") : null;
+    svg.setAttribute("viewBox", layoutViewBox || "0 0 1000 1400");
+    const preserve = layoutSvg ? layoutSvg.getAttribute("preserveAspectRatio") : null;
+    if (preserve) {
+      svg.setAttribute("preserveAspectRatio", preserve);
+    } else {
+      svg.removeAttribute("preserveAspectRatio");
+    }
+    return svg;
+  }
+
   function buildBaseGroup(def, text) {
     return {
       id: def.id,
@@ -651,9 +676,11 @@
     const viewBox = getViewBox(layoutSvg);
     if (!layout || !viewBox) return [];
     const layoutRect = layout.getBoundingClientRect();
-    if (!layoutRect.width || !layoutRect.height) return [];
-    const scaleX = viewBox.width / layoutRect.width;
-    const scaleY = viewBox.height / layoutRect.height;
+    const layoutWidth = layoutRect.width || layout.clientWidth || 0;
+    const layoutHeight = layoutRect.height || layout.clientHeight || 0;
+    if (!layoutWidth || !layoutHeight) return [];
+    const scaleX = viewBox.width / layoutWidth;
+    const scaleY = viewBox.height / layoutHeight;
     const groups = [];
     let index = 0;
 
@@ -711,7 +738,7 @@
     const root = resolveRoot(cardRoot);
     if (!root) return;
     const layout = root.querySelector(".tcg-card__layout");
-    const svg = root.querySelector('[data-role="card-ui-svg"]');
+    const svg = ensureUiSvgLayer(root);
     const atlas = getUiAtlas();
     const renderer = (window.AtlasSvgRenderer && window.AtlasSvgRenderer.renderAtlasGroups) || window.renderAtlasGroups;
 
