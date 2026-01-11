@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Viewer</title>
+  <style>
+    html, body { margin:0; padding:0; background:#0b1020; color:#e5e7eb; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+    header { display:flex; align-items:center; gap:10px; padding:10px; position:sticky; top:0; background:#0f172a; border-bottom:1px solid rgba(255,255,255,0.08); }
+    #info { font-size:12px; opacity:0.9; }
+    #cv { display:block; margin:10px auto; image-rendering: pixelated; border:1px solid rgba(255,255,255,0.12); }
+    button { background:#1f2937; color:#e5e7eb; border:1px solid rgba(255,255,255,0.14); border-radius:8px; padding:6px 10px; cursor:pointer; }
+  </style>
+</head>
+<body>
+  <header>
+    <button id="btnToggle" type="button">Pause</button>
+    <div id="info"></div>
+  </header>
+  <canvas id="cv" width="256" height="256"></canvas>
+  <script src="viewer.js"></script>
+</body>
+</html>
