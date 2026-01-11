@@ -489,7 +489,10 @@
   }
 
   function buildDefs(stage, glyphs, glyphKeys) {
+    const prior = stage.querySelector("defs[data-atlas-defs=\"true\"]");
+    if (prior) prior.remove();
     const defs = svgEl("defs");
+    defs.setAttribute("data-atlas-defs", "true");
     const keys = glyphKeys && glyphKeys.size ? Array.from(glyphKeys) : Object.keys(glyphs);
     for (const key of keys) {
       const g = glyphs[key];
@@ -878,10 +881,13 @@
       stage.setAttribute("viewBox", `0 0 ${Math.max(1, resolvedViewBox.width)} ${Math.max(1, resolvedViewBox.height)}`);
     }
 
+    const svgRoot = (stage instanceof SVGSVGElement) ? stage : stage.ownerSVGElement;
+    if (!svgRoot) throw new Error("renderAtlasGroups: svgEl must be an <svg> element or have an ownerSVGElement");
+
     verifyGlyphCoverage(groups, glyphs, fallbackKey, spaceKey);
     clearStage(stage);
     const referencedKeys = collectReferencedGlyphKeys(groups, glyphs, fallbackKey, spaceKey);
-    buildDefs(stage, glyphs, referencedKeys);
+    buildDefs(svgRoot, glyphs, referencedKeys);
 
     const opts = {
       stage,
