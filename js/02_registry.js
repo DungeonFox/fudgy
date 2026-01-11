@@ -358,6 +358,7 @@ function updateStatus(cardRoot){
   if (recMini) recMini.textContent = state.roots.recipe ? state.roots.recipe : "(no recipe root)";
   if (taskMini) taskMini.textContent = (state.roots.tasks && state.roots.tasks.length) ? `${state.roots.tasks.length} task(s)` : "(no tasks)";
   if (mergedJson) mergedJson.value = JSON.stringify(toManifestSnapshot(root), null, 2);
+  if (typeof window.updateCardUiSvg === "function") window.updateCardUiSvg(root);
 }
 
 // Expose helpers for card_store + patches
