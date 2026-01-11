@@ -46,27 +46,7 @@
         resolve(parsed);
         return;
       }
-
-      const src = script.getAttribute("src") || script.dataset.src;
-      if (!src) {
-        resolve(null);
-        return;
-      }
-
-      fetch(src)
-        .then((res) => {
-          if (!res.ok) throw new Error(`HTTP ${res.status}`);
-          return res.json();
-        })
-        .then((data) => {
-          cachedAtlas = data;
-          if (data) window.cardUiAtlas = data;
-          resolve(data);
-        })
-        .catch((err) => {
-          console.warn("[card-ui-svg] Failed to load font atlas.", err);
-          resolve(null);
-        });
+      resolve(null);
     });
 
     return atlasPromise;
