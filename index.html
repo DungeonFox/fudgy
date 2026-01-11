@@ -206,9 +206,9 @@ END README
         <svg class="card-ui-svg" data-role="card-ui-svg" viewBox="0 0 1000 1400"></svg>
         <div class="tcg-card__content">
           <div class="card-header">
-            <div class="card-header__title card-ui-html">
-              <span data-role="card-title"></span>
-              <span data-role="play-mini" class="card-header__status">stopped</span>
+            <div class="card-header__title">
+              <span data-role="card-title" class="card-ui-html"></span>
+              <span data-role="play-mini" class="card-header__status card-ui-html">stopped</span>
             </div>
             <div class="card-header__badge card-header__controls card-ui-html">
               <button data-role="btn-play" class="card-control" type="button" title="Play/Pause preview" aria-label="Play or pause preview" aria-pressed="false">▶</button>
@@ -232,8 +232,8 @@ END README
             <div class="card-type">
           <!-- TEMPLATE -->
           <section class="panel">
-          <h2 class="card-ui-html" data-role="panel-heading-template">
-            <span>Template Editor <span class="mini" data-role="tpl-root-mini"></span></span>
+          <h2 data-role="panel-heading-template">
+            <span class="card-ui-html">Template Editor <span class="mini" data-role="tpl-root-mini"></span></span>
             <span class="kbar">
               <input data-role="file-template" type="file" accept=".json,application/json" />
               <button data-role="btn-save-template">Save template.json</button>
@@ -294,8 +294,8 @@ END README
       <div class="card-text">
         <!-- RECIPE -->
         <section class="panel">
-        <h2 class="card-ui-html" data-role="panel-heading-recipe">
-          <span>Animation Recipe Builder <span class="mini" data-role="rec-root-mini"></span></span>
+        <h2 data-role="panel-heading-recipe">
+          <span class="card-ui-html">Animation Recipe Builder <span class="mini" data-role="rec-root-mini"></span></span>
           <span class="kbar">
             <input data-role="file-recipe" type="file" accept=".json,application/json" />
             <button data-role="btn-save-recipe">Save animation.json</button>
@@ -356,8 +356,8 @@ END README
       <!-- TASKER -->
       <div class="card-task">
       <section class="panel">
-      <h2 class="card-ui-html" data-role="panel-heading-task">
-        <span>Tasker Manager <span class="mini" data-role="task-root-mini"></span></span>
+      <h2 data-role="panel-heading-task">
+        <span class="card-ui-html">Tasker Manager <span class="mini" data-role="task-root-mini"></span></span>
         <span class="kbar">
           <input data-role="file-tasker" type="file" accept=".json,application/json" />
           <button data-role="btn-save-tasks">Save tasks.json</button>
