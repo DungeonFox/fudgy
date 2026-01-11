@@ -211,12 +211,12 @@ END README
               <span data-role="play-mini" class="card-header__status card-ui-html">stopped</span>
             </div>
             <div class="card-header__badge card-header__controls card-ui-html">
-              <button data-role="btn-play" class="card-control" type="button" title="Play/Pause preview" aria-label="Play or pause preview" aria-pressed="false">&gt;</button>
-              <button data-role="btn-step" class="card-control" type="button" title="Step preview" aria-label="Step preview frame">&gt;&gt;</button>
-              <button data-role="btn-reset" class="card-control" type="button" title="Reset preview" aria-label="Reset preview">RST</button>
+              <button data-role="btn-play" class="card-control" type="button" title="Play/Pause preview" aria-label="Play or pause preview" aria-pressed="false"><span class="card-ui-html">&gt;</span></button>
+              <button data-role="btn-step" class="card-control" type="button" title="Step preview" aria-label="Step preview frame"><span class="card-ui-html">&gt;&gt;</span></button>
+              <button data-role="btn-reset" class="card-control" type="button" title="Reset preview" aria-label="Reset preview"><span class="card-ui-html">RST</span></button>
               <span class="card-header__divider" aria-hidden="true"></span>
-              <button class="card-control card-control--toggle is-active" type="button" data-panel-toggle="registry" aria-pressed="true" title="Toggle registry panel" aria-label="Toggle registry panel">REG</button>
-              <button class="card-control card-control--toggle is-active" type="button" data-panel-toggle="log" aria-pressed="true" title="Toggle log panel" aria-label="Toggle log panel">LOG</button>
+              <button class="card-control card-control--toggle is-active" type="button" data-panel-toggle="registry" aria-pressed="true" title="Toggle registry panel" aria-label="Toggle registry panel"><span class="card-ui-html">REG</span></button>
+              <button class="card-control card-control--toggle is-active" type="button" data-panel-toggle="log" aria-pressed="true" title="Toggle log panel" aria-label="Toggle log panel"><span class="card-ui-html">LOG</span></button>
             </div>
           </div>
           <div class="card-image">
@@ -242,14 +242,14 @@ END README
           <div class="content" data-role="template-panel">
             <div class="grid2">
               <div class="field">
-                <label>tileW / tileH</label>
+                <label><span class="card-ui-html" data-ui-text>tileW / tileH</span></label>
                 <div class="row">
                   <input data-role="tpl-tile-w" type="number" min="1" step="1" />
                   <input data-role="tpl-tile-h" type="number" min="1" step="1" />
                 </div>
               </div>
               <div class="field">
-                <label>gridW / gridH (output size = tileW x gridW by tileH x gridH)</label>
+                <label><span class="card-ui-html" data-ui-text>gridW / gridH (output size = tileW x gridW by tileH x gridH)</span></label>
                 <div class="row">
                   <input data-role="tpl-grid-w" type="number" min="1" step="1" />
                   <input data-role="tpl-grid-h" type="number" min="1" step="1" />
@@ -261,8 +261,8 @@ END README
 
           <div class="row" style="justify-content:space-between; align-items:flex-end;">
             <div>
-              <div class="muted small">Rects (source slices + destination placement)</div>
-              <div class="small muted">IDs are stable refs. Rects are shared across layers.</div>
+              <div class="muted small"><span class="card-ui-html" data-ui-text>Rects (source slices + destination placement)</span></div>
+              <div class="small muted"><span class="card-ui-html" data-ui-text>IDs are stable refs. Rects are shared across layers.</span></div>
             </div>
             <div class="row">
               <button data-role="btn-add-rect"><span class="card-ui-html" data-ui-text>+ Rect</span></button>
@@ -277,8 +277,8 @@ END README
 
           <div class="row" style="justify-content:space-between; align-items:flex-end;">
             <div>
-              <div class="muted small">Frame Slots (timeline)</div>
-              <div class="small muted">Recipe overrides are keyed by FrameSlot IDs.</div>
+              <div class="muted small"><span class="card-ui-html" data-ui-text>Frame Slots (timeline)</span></div>
+              <div class="small muted"><span class="card-ui-html" data-ui-text>Recipe overrides are keyed by FrameSlot IDs.</span></div>
             </div>
             <div class="row">
               <button data-role="btn-add-frame"><span class="card-ui-html" data-ui-text>+ FrameSlot</span></button>
@@ -303,10 +303,10 @@ END README
         </h2>
         <div class="content" data-role="recipe-panel">
           <div class="field">
-            <label>Recipe -> Template Root</label>
+            <label><span class="card-ui-html" data-ui-text>Recipe -> Template Root</span></label>
             <select data-role="recipe-template-select"></select>
             <div class="small muted" style="margin-top:6px">
-              This recipe renders using the selected Template root node.
+              <span class="card-ui-html" data-ui-text>This recipe renders using the selected Template root node.</span>
             </div>
           </div>
 
@@ -314,8 +314,8 @@ END README
 
           <div class="row" style="justify-content:space-between; align-items:flex-end;">
             <div>
-              <div class="muted small">Assets</div>
-              <div class="small muted">Load images (embedded as data URLs for portability).</div>
+              <div class="muted small"><span class="card-ui-html" data-ui-text>Assets</span></div>
+              <div class="small muted"><span class="card-ui-html" data-ui-text>Load images (embedded as data URLs for portability).</span></div>
             </div>
             <div class="row">
               <input data-role="file-asset" type="file" accept="image/*" multiple />
@@ -330,8 +330,8 @@ END README
 
           <div class="row" style="justify-content:space-between; align-items:flex-end;">
             <div>
-              <div class="muted small">Layers</div>
-              <div class="small muted">Each layer samples an Asset and draws a Rect, with per-frame overrides.</div>
+              <div class="muted small"><span class="card-ui-html" data-ui-text>Layers</span></div>
+              <div class="small muted"><span class="card-ui-html" data-ui-text>Each layer samples an Asset and draws a Rect, with per-frame overrides.</span></div>
             </div>
             <div class="row">
               <button data-role="btn-add-layer"><span class="card-ui-html" data-ui-text>+ Layer</span></button>
@@ -344,8 +344,8 @@ END README
 
           <div class="hr"></div>
           <div class="field">
-            <label>Selected Layer Overrides (by FrameSlot)</label>
-            <div class="small muted">Override rect and/or dx/dy/opacity for specific FrameSlots.</div>
+            <label><span class="card-ui-html" data-ui-text>Selected Layer Overrides (by FrameSlot)</span></label>
+            <div class="small muted"><span class="card-ui-html" data-ui-text>Override rect and/or dx/dy/opacity for specific FrameSlots.</span></div>
             <div style="height:8px"></div>
             <div class="list" data-role="override-list"></div>
           </div>
@@ -367,8 +367,8 @@ END README
       <div class="content" data-role="task-panel">
         <div class="row" style="justify-content:space-between; align-items:flex-end;">
           <div>
-            <div class="muted small">Tasks</div>
-            <div class="small muted">Define tasks that control the pop-out viewer.</div>
+            <div class="muted small"><span class="card-ui-html" data-ui-text>Tasks</span></div>
+            <div class="small muted"><span class="card-ui-html" data-ui-text>Define tasks that control the pop-out viewer.</span></div>
           </div>
           <div class="row">
             <button data-role="btn-add-task"><span class="card-ui-html" data-ui-text>+ Task</span></button>
@@ -379,8 +379,8 @@ END README
         <div class="list" data-role="task-list"></div>
         <div class="hr"></div>
         <div class="field">
-          <label>Selected Task Editor</label>
-          <div class="small muted">Edit name and commands (as JSON array). Commands are executed sequentially.</div>
+          <label><span class="card-ui-html" data-ui-text>Selected Task Editor</span></label>
+          <div class="small muted"><span class="card-ui-html" data-ui-text>Edit name and commands (as JSON array). Commands are executed sequentially.</span></div>
           <div class="row" style="gap:8px; margin-top:6px">
             <input data-role="task-name-input" type="text" placeholder="Task name" style="flex:1" />
           </div>
@@ -394,16 +394,16 @@ END README
         <!-- Pop-out viewer geometry controls -->
         <div class="hr"></div>
         <div class="field">
-          <label>Pop-out Viewer Geometry</label>
-          <div class="small muted">Configure the default size and screen position of the pop-out viewer. These values are used when opening a new viewer and can be applied to an open viewer at any time.</div>
+          <label><span class="card-ui-html" data-ui-text>Pop-out Viewer Geometry</span></label>
+          <div class="small muted"><span class="card-ui-html" data-ui-text>Configure the default size and screen position of the pop-out viewer. These values are used when opening a new viewer and can be applied to an open viewer at any time.</span></div>
           <div class="row" style="flex-wrap:wrap; gap:8px; margin-top:6px">
-            <label style="font-size:11px">W</label>
+            <label style="font-size:11px"><span class="card-ui-html" data-ui-text>W</span></label>
             <input data-role="popout-width" type="number" min="100" step="10" style="width:70px" aria-label="Pop-out width" />
-            <label style="font-size:11px">H</label>
+            <label style="font-size:11px"><span class="card-ui-html" data-ui-text>H</span></label>
             <input data-role="popout-height" type="number" min="100" step="10" style="width:70px" aria-label="Pop-out height" />
-            <label style="font-size:11px">Left</label>
+            <label style="font-size:11px"><span class="card-ui-html" data-ui-text>Left</span></label>
             <input data-role="popout-left" type="number" step="10" style="width:70px" aria-label="Pop-out left" />
-            <label style="font-size:11px">Top</label>
+            <label style="font-size:11px"><span class="card-ui-html" data-ui-text>Top</span></label>
             <input data-role="popout-top" type="number" step="10" style="width:70px" aria-label="Pop-out top" />
             <button data-role="popout-geometry-apply" class="primary"><span class="card-ui-html" data-ui-text>Apply</span></button>
           </div>
@@ -417,12 +417,12 @@ END README
         <div class="toggle">
           <label title="Recompute IDs from canonical node content and rewrite references.">
             <input data-role="deterministic-ids" type="checkbox" checked />
-            Deterministic IDs
+            <span class="card-ui-html">Deterministic IDs</span>
           </label>
         </div>
-        <button data-role="btn-rehash" class="primary" title="Recompute IDs topologically; rewrite references; clears caches.">Recompute IDs</button>
-        <button data-role="btn-popout" class="primary">Pop-out Viewer</button>
-        <button data-role="btn-export-atlas" class="primary">Export Atlas PNG + JSON</button>
+        <button data-role="btn-rehash" class="primary" title="Recompute IDs topologically; rewrite references; clears caches."><span class="card-ui-html">Recompute IDs</span></button>
+        <button data-role="btn-popout" class="primary"><span class="card-ui-html">Pop-out Viewer</span></button>
+        <button data-role="btn-export-atlas" class="primary"><span class="card-ui-html">Export Atlas PNG + JSON</span></button>
       </div>
     </div>
     </div>
