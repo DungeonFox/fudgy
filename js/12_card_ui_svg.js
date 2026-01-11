@@ -625,14 +625,19 @@
     if (!group) return;
     const actionKey = group.actionKey || "";
     const role = group.dataRole || "";
+    let handled = false;
     if (typeof dispatchUiAction === "function"){
-      const handled = dispatchUiAction(root, { role, actionKey, originalEvent });
-      if (handled) return;
+      handled = dispatchUiAction(root, { role, actionKey, originalEvent });
+      if (handled){
+        if (originalEvent) originalEvent.__uiActionHandled = true;
+        return;
+      }
     }
     if (!actionKey) return;
     const target = resolveActionTarget(root, actionKey);
     if (!target) return;
     target.click();
+    if (originalEvent) originalEvent.__uiActionHandled = true;
   }
 
   function buildGroups(root) {

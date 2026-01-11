@@ -3,10 +3,39 @@
   // ---------------------------
   const currentViewerGeometryByCard = new Map();
   window.currentViewerGeometryByCard = currentViewerGeometryByCard;
+  const svgActionHandlersByRoot = new WeakMap();
+
+  function initSvgGroupActions(cardRoot){
+    const root = resolveCardRoot(cardRoot);
+    if (!root || svgActionHandlersByRoot.has(root)) return;
+
+    const handleActivate = (event) => {
+      if (event.__uiActionHandled) return;
+      const target = event.target;
+      if (!target || typeof target.closest !== "function") return;
+      const groupEl = target.closest("[data-action-key],[data-role]");
+      if (!groupEl || !(groupEl instanceof SVGElement)) return;
+
+      if (event.type === "keydown" && event.key !== "Enter" && event.key !== " ") return;
+      const actionKey = groupEl.getAttribute("data-action-key") || "";
+      const role = groupEl.getAttribute("data-role") || "";
+      if (!actionKey && !role) return;
+
+      event.preventDefault();
+      if (typeof dispatchUiAction !== "function") return;
+      const handled = dispatchUiAction(root, { role, actionKey, originalEvent: event });
+      if (handled) event.__uiActionHandled = true;
+    };
+
+    root.addEventListener("click", handleActivate);
+    root.addEventListener("keydown", handleActivate);
+    svgActionHandlersByRoot.set(root, handleActivate);
+  }
 
   function initCoreEvents(cardRoot){
     const root = resolveCardRoot(cardRoot);
     if (!root) return;
+    initSvgGroupActions(root);
     const btnRehash = $role(root, "btn-rehash");
     const btnPopout = $role(root, "btn-popout");
     const btnExportAtlas = $role(root, "btn-export-atlas");
