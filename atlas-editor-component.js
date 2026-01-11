@@ -93,15 +93,12 @@
   badge.textContent = `${ATLAS.font.family} — unitsPerEm=${ATLAS.font.unitsPerEm} (ASCII demo)`;
 
   function render() {
-    // Stage size
-    const rect = stage.getBoundingClientRect();
     const globalGuides = byId("globalGuides").checked;
 
     renderAtlasGroups({
       svgEl: stage,
       atlas: ATLAS,
       groups: GROUPS,
-      viewBoxSize: { width: Math.max(1, rect.width), height: Math.max(1, rect.height) },
       globalGuides,
       selectedGroupId: SELECTED_GROUP_ID,
       onGroupAction: ({ group, source, originalEvent }) => {
