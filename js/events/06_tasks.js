@@ -44,8 +44,7 @@
     const btnStep = root ? $role(root, "btn-step") : null;
     const btnReset = root ? $role(root, "btn-reset") : null;
 
-    if (btnAdd){
-      btnAdd.onclick = () => run(() => {
+    const onAdd = () => run(() => {
         // Create a new Task node with a default name. Use a properly closed template literal for the name.
         // Build task name using concatenation to avoid nested template literal issues
         const t = { type:"Task", name: 'Task ' + ((registry.roots.tasks||[]).length + 1), commands: [] };
@@ -58,10 +57,14 @@
         refreshAllUI(root);
         renderOnce(root);
       });
+    if (btnAdd){
+      btnAdd.onclick = onAdd;
+    }
+    if (typeof registerUiAction === "function"){
+      registerUiAction(root, { role: "btn-add-task" }, onAdd);
     }
 
-    if (btnDel){
-      btnDel.onclick = () => run(() => {
+    const onDelete = () => run(() => {
         if (!selectedTaskId) return;
         registry.roots.tasks = (registry.roots.tasks||[]).filter(x => x !== selectedTaskId);
         deleteNode(selectedTaskId, root);
@@ -70,23 +73,35 @@
         refreshAllUI(root);
         renderOnce(root);
       });
+    if (btnDel){
+      btnDel.onclick = onDelete;
+    }
+    if (typeof registerUiAction === "function"){
+      registerUiAction(root, { role: "btn-del-task" }, onDelete);
     }
 
-    if (btnUpdate){
-      btnUpdate.onclick = () => run(() => {
+    const onUpdate = () => run(() => {
         updateSelectedTaskFromEditor(root);
       });
+    if (btnUpdate){
+      btnUpdate.onclick = onUpdate;
+    }
+    if (typeof registerUiAction === "function"){
+      registerUiAction(root, { role: "btn-update-task" }, onUpdate);
     }
 
-    if (btnRun){
-      btnRun.onclick = () => run(() => {
+    const onRun = () => run(() => {
         const ok = updateSelectedTaskFromEditor(root);
         if (ok) runTasks(root);
       });
+    if (btnRun){
+      btnRun.onclick = onRun;
+    }
+    if (typeof registerUiAction === "function"){
+      registerUiAction(root, { role: "btn-run-tasks" }, onRun);
     }
 
-    if (btnPlay){
-      btnPlay.onclick = () => run(async () => {
+    const onPlay = () => run(async () => {
         const state = getRendererState(root);
         if (!state) return;
         state.playing = !state.playing;
@@ -100,10 +115,14 @@
           await renderOnce(root);
         }
       });
+    if (btnPlay){
+      btnPlay.onclick = onPlay;
+    }
+    if (typeof registerUiAction === "function"){
+      registerUiAction(root, { role: "btn-play", actionKey: "play" }, onPlay);
     }
 
-    if (btnStep){
-      btnStep.onclick = () => run(async () => {
+    const onStep = () => run(async () => {
         const state = getRendererState(root);
         const plan = registry.roots.recipe ? buildRenderPlan(registry.roots.recipe) : null;
         if (!state || !plan || plan.frames.length === 0) return;
@@ -111,15 +130,24 @@
         await renderOnce(root);
         pushStateToPopout(true, root);
       });
+    if (btnStep){
+      btnStep.onclick = onStep;
+    }
+    if (typeof registerUiAction === "function"){
+      registerUiAction(root, { role: "btn-step", actionKey: "step" }, onStep);
     }
 
-    if (btnReset){
-      btnReset.onclick = () => run(async () => {
+    const onReset = () => run(async () => {
         const state = getRendererState(root);
         if (!state) return;
         state.curFrame = 0;
         await renderOnce(root);
         pushStateToPopout(true, root);
       });
+    if (btnReset){
+      btnReset.onclick = onReset;
+    }
+    if (typeof registerUiAction === "function"){
+      registerUiAction(root, { role: "btn-reset", actionKey: "reset" }, onReset);
     }
   }

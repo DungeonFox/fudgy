@@ -710,6 +710,9 @@
     const gEl = svgEl("g");
     gEl.setAttribute("class", "uiButton");
     gEl.setAttribute("data-group-id", group.id);
+    gEl.setAttribute("data-ui-role", "button");
+    if (group.dataRole) gEl.setAttribute("data-role", group.dataRole);
+    if (group.actionKey) gEl.setAttribute("data-action-key", group.actionKey);
     gEl.setAttribute("role", "button");
     gEl.setAttribute("tabindex", "0");
     gEl.setAttribute("aria-label", (group.name || group.id || "button").toString());

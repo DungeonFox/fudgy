@@ -4,8 +4,7 @@
     const run = (fn) => (typeof window.withCardRegistry === "function") ? window.withCardRegistry(root, fn) : fn();
     const btnAdd = root ? $role(root, "btn-add-layer") : null;
     const btnDel = root ? $role(root, "btn-del-layer") : null;
-    if (btnAdd){
-      btnAdd.onclick = () => run(() => {
+    const onAdd = () => run(() => {
         const rec = getNode(registry.roots.recipe);
         if (!rec || rec.type !== "Recipe") return;
 
@@ -27,10 +26,14 @@
         refreshAllUI(root);
         renderOnce(root);
       });
+    if (btnAdd){
+      btnAdd.onclick = onAdd;
+    }
+    if (typeof registerUiAction === "function"){
+      registerUiAction(root, { role: "btn-add-layer" }, onAdd);
     }
 
-    if (btnDel){
-      btnDel.onclick = () => run(() => {
+    const onDelete = () => run(() => {
         const rec = getNode(registry.roots.recipe);
         if (!rec || rec.type !== "Recipe" || !selectedLayerId) return;
         rec.layers = (rec.layers||[]).filter(x => x !== selectedLayerId);
@@ -41,5 +44,10 @@
         refreshAllUI(root);
         renderOnce(root);
       });
+    if (btnDel){
+      btnDel.onclick = onDelete;
+    }
+    if (typeof registerUiAction === "function"){
+      registerUiAction(root, { role: "btn-del-layer" }, onDelete);
     }
   }

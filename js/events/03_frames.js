@@ -4,8 +4,7 @@
     const run = (fn) => (typeof window.withCardRegistry === "function") ? window.withCardRegistry(root, fn) : fn();
     const btnAdd = root ? $role(root, "btn-add-frame") : null;
     const btnDel = root ? $role(root, "btn-del-frame") : null;
-    if (btnAdd){
-      btnAdd.onclick = () => run(() => {
+    const onAdd = () => run(() => {
         const tpl = getNode(registry.roots.template);
         if (!tpl || tpl.type !== "Template") return;
         const idx = (tpl.frames||[]).length;
@@ -21,9 +20,13 @@
         refreshAllUI(root);
         renderOnce(root);
       });
+    if (btnAdd){
+      btnAdd.onclick = onAdd;
     }
-    if (btnDel){
-      btnDel.onclick = () => run(() => {
+    if (typeof registerUiAction === "function"){
+      registerUiAction(root, { role: "btn-add-frame" }, onAdd);
+    }
+    const onDelete = () => run(() => {
         const tpl = getNode(registry.roots.template);
         if (!tpl || tpl.type !== "Template" || !selectedFrameId) return;
         tpl.frames = (tpl.frames||[]).filter(x => x !== selectedFrameId);
@@ -43,5 +46,10 @@
         refreshAllUI(root);
         renderOnce(root);
       });
+    if (btnDel){
+      btnDel.onclick = onDelete;
+    }
+    if (typeof registerUiAction === "function"){
+      registerUiAction(root, { role: "btn-del-frame" }, onDelete);
     }
   }

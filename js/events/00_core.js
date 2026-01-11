@@ -10,9 +10,17 @@
     const btnRehash = $role(root, "btn-rehash");
     const btnPopout = $role(root, "btn-popout");
     const btnExportAtlas = $role(root, "btn-export-atlas");
-    if (btnRehash) btnRehash.onclick = () => recomputeIdsTopologically(root);
-    if (btnPopout) btnPopout.onclick = () => openPopout(root);
-    if (btnExportAtlas) btnExportAtlas.onclick = () => exportAtlas(root);
+    const onRehash = () => recomputeIdsTopologically(root);
+    const onPopout = () => openPopout(root);
+    const onExportAtlas = () => exportAtlas(root);
+    if (btnRehash) btnRehash.onclick = onRehash;
+    if (btnPopout) btnPopout.onclick = onPopout;
+    if (btnExportAtlas) btnExportAtlas.onclick = onExportAtlas;
+    if (typeof registerUiAction === "function"){
+      registerUiAction(root, { role: "btn-rehash", actionKey: "rehash" }, onRehash);
+      registerUiAction(root, { role: "btn-popout", actionKey: "popout" }, onPopout);
+      registerUiAction(root, { role: "btn-export-atlas", actionKey: "export-atlas" }, onExportAtlas);
+    }
 
     const fileTemplate = $role(root, "file-template");
     const fileRecipe = $role(root, "file-recipe");
@@ -42,13 +50,20 @@
     const btnSaveTemplate = $role(root, "btn-save-template");
     const btnSaveRecipe = $role(root, "btn-save-recipe");
     const btnSaveTasks = $role(root, "btn-save-tasks");
-    if (btnSaveTemplate) btnSaveTemplate.onclick = () => saveTemplateJson(root);
-    if (btnSaveRecipe) btnSaveRecipe.onclick = () => saveRecipeJson(root);
-    if (btnSaveTasks) btnSaveTasks.onclick = () => saveTasksJson(root);
+    const onSaveTemplate = () => saveTemplateJson(root);
+    const onSaveRecipe = () => saveRecipeJson(root);
+    const onSaveTasks = () => saveTasksJson(root);
+    if (btnSaveTemplate) btnSaveTemplate.onclick = onSaveTemplate;
+    if (btnSaveRecipe) btnSaveRecipe.onclick = onSaveRecipe;
+    if (btnSaveTasks) btnSaveTasks.onclick = onSaveTasks;
+    if (typeof registerUiAction === "function"){
+      registerUiAction(root, { role: "btn-save-template" }, onSaveTemplate);
+      registerUiAction(root, { role: "btn-save-recipe" }, onSaveRecipe);
+      registerUiAction(root, { role: "btn-save-tasks" }, onSaveTasks);
+    }
 
     const btnCopyMerged = $role(root, "btn-copy-merged");
-    if (btnCopyMerged){
-      btnCopyMerged.onclick = async () => {
+    const onCopyMerged = async () => {
         try{
           const merged = $role(root, "merged-json");
           await navigator.clipboard.writeText(merged ? merged.value : "");
@@ -57,11 +72,15 @@
           log("Clipboard copy failed (browser permissions).", "warn", root);
         }
       };
+    if (btnCopyMerged){
+      btnCopyMerged.onclick = onCopyMerged;
+    }
+    if (typeof registerUiAction === "function"){
+      registerUiAction(root, { role: "btn-copy-merged" }, onCopyMerged);
     }
 
     const btnLoadMerged = $role(root, "btn-load-merged");
-    if (btnLoadMerged){
-      btnLoadMerged.onclick = () => {
+    const onLoadMerged = () => {
         const merged = $role(root, "merged-json");
         const j = safeJsonParse(merged ? merged.value : "");
         if (j.__error){ log(`Merged JSON parse error: ${j.__error}`, "bad", root); return; }
@@ -73,6 +92,19 @@
         renderOnce(root);
         log("Loaded merged manifest JSON.", "info", root);
       };
+    if (btnLoadMerged){
+      btnLoadMerged.onclick = onLoadMerged;
+    }
+    if (typeof registerUiAction === "function"){
+      registerUiAction(root, { role: "btn-load-merged" }, onLoadMerged);
+    }
+
+    const deterministic = $role(root, "deterministic-ids");
+    if (deterministic && typeof registerUiAction === "function"){
+      registerUiAction(root, { role: "deterministic-ids", actionKey: "deterministic-ids" }, () => {
+        deterministic.checked = !deterministic.checked;
+        deterministic.dispatchEvent(new Event("change", { bubbles: true }));
+      });
     }
 
     if (!window.__coreMessageListener){

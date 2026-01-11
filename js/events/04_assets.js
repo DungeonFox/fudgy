@@ -4,8 +4,7 @@
     const run = (fn) => (typeof window.withCardRegistry === "function") ? window.withCardRegistry(root, fn) : fn();
     const btnAdd = root ? $role(root, "btn-add-asset") : null;
     const fileAsset = root ? $role(root, "file-asset") : null;
-    if (btnAdd){
-      btnAdd.onclick = () => run(() => {
+    const onAdd = () => run(() => {
         const a = { type:"Asset", name:"asset.png", src:"" };
         const aid = makeNewId("asset");
         setNode(aid, a);
@@ -18,6 +17,11 @@
         refreshAllUI(root);
         renderOnce(root);
       });
+    if (btnAdd){
+      btnAdd.onclick = onAdd;
+    }
+    if (typeof registerUiAction === "function"){
+      registerUiAction(root, { role: "btn-add-asset" }, onAdd);
     }
 
     // Assets: load image files

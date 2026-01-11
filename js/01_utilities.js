@@ -6,6 +6,7 @@
   const $$in = (root, sel) => root ? Array.from(root.querySelectorAll(sel)) : [];
   const $role = (root, role) => $in(root, `[data-role="${role}"]`);
   const statusPill = $("#statusPill");
+  const uiActionHandlersByRoot = new WeakMap();
 
   function toDataRole(id){
     if (!id || typeof id !== "string") return "";
@@ -80,6 +81,48 @@
     const local = root ? $role(root, role) : null;
     if (local) return local;
     return findRoleInPanels(role, root);
+  }
+
+  function getUiActionHandlers(root){
+    const cardRoot = resolveCardRoot(root);
+    if (!cardRoot) return null;
+    let handlers = uiActionHandlersByRoot.get(cardRoot);
+    if (!handlers){
+      handlers = new Map();
+      uiActionHandlersByRoot.set(cardRoot, handlers);
+    }
+    return handlers;
+  }
+
+  function registerUiAction(root, { role, actionKey } = {}, handler){
+    if (typeof handler !== "function") return;
+    const handlers = getUiActionHandlers(root);
+    if (!handlers) return;
+    if (actionKey) handlers.set(`action:${actionKey}`, handler);
+    if (role) handlers.set(`role:${role}`, handler);
+  }
+
+  function dispatchUiAction(root, { role, actionKey, originalEvent } = {}){
+    const handlers = getUiActionHandlers(root);
+    let handler = null;
+    if (handlers && actionKey && handlers.has(`action:${actionKey}`)){
+      handler = handlers.get(`action:${actionKey}`);
+    }
+    if (!handler && handlers && role && handlers.has(`role:${role}`)){
+      handler = handlers.get(`role:${role}`);
+    }
+    if (handler){
+      handler(originalEvent);
+      return true;
+    }
+    if (role){
+      const el = resolveRoleElement(root, role);
+      if (el && typeof el.click === "function"){
+        el.click();
+        return true;
+      }
+    }
+    return false;
   }
 
   // Default geometry for the pop‑out viewer. These values are used when opening a new

@@ -58,6 +58,7 @@
       showGuides: def.showGuides,
       opacity: def.opacity,
       uiRole: def.uiRole,
+      dataRole: def.dataRole,
       contentAsButton: def.contentAsButton,
       actionKey: def.actionKey,
       text: text
@@ -138,6 +139,7 @@
       name: "Play",
       uiRole: "button",
       actionKey: "play",
+      dataRole: "btn-play",
       originX: headerButtonStartX + (headerButtonWidth / 2),
       originY: headerButtonCenterY,
       areaL: headerButtonWidth / 2,
@@ -164,6 +166,7 @@
       name: "Step",
       uiRole: "button",
       actionKey: "step",
+      dataRole: "btn-step",
       originX: headerButtonStartX + (headerButtonWidth / 2) + (headerButtonWidth + headerButtonGap),
       originY: headerButtonCenterY,
       areaL: headerButtonWidth / 2,
@@ -190,6 +193,7 @@
       name: "Reset",
       uiRole: "button",
       actionKey: "reset",
+      dataRole: "btn-reset",
       originX: headerButtonStartX + (headerButtonWidth / 2) + (headerButtonWidth + headerButtonGap) * 2,
       originY: headerButtonCenterY,
       areaL: headerButtonWidth / 2,
@@ -343,6 +347,7 @@
       name: "Deterministic IDs",
       uiRole: "button",
       actionKey: "deterministic-ids",
+      dataRole: "deterministic-ids",
       originX: footerButtonStartX + (footerButtonWidths[0] / 2),
       originY: footerButtonTop + (footerButtonHeights / 2),
       areaL: footerButtonWidths[0] / 2,
@@ -369,6 +374,7 @@
       name: "Recompute IDs",
       uiRole: "button",
       actionKey: "rehash",
+      dataRole: "btn-rehash",
       originX: footerButtonStartX + footerButtonWidths[0] + footerButtonGap + (footerButtonWidths[1] / 2),
       originY: footerButtonTop + (footerButtonHeights / 2),
       areaL: footerButtonWidths[1] / 2,
@@ -395,6 +401,7 @@
       name: "Pop-out Viewer",
       uiRole: "button",
       actionKey: "popout",
+      dataRole: "btn-popout",
       originX: footerButtonStartX + footerButtonWidths[0] + footerButtonWidths[1] + (footerButtonGap * 2) + (footerButtonWidths[2] / 2),
       originY: footerButtonTop + (footerButtonHeights / 2),
       areaL: footerButtonWidths[2] / 2,
@@ -421,6 +428,7 @@
       name: "Export Atlas",
       uiRole: "button",
       actionKey: "export-atlas",
+      dataRole: "btn-export-atlas",
       originX: footerButtonStartX + footerButtonWidths[0] + footerButtonWidths[1] + footerButtonWidths[2] + (footerButtonGap * 3) + (footerButtonWidths[3] / 2),
       originY: footerButtonTop + (footerButtonHeights / 2),
       areaL: footerButtonWidths[3] / 2,
@@ -470,9 +478,16 @@
     }
   }
 
-  function handleGroupAction({ group }, root) {
-    if (!group || !group.actionKey) return;
-    const target = resolveActionTarget(root, group.actionKey);
+  function handleGroupAction({ group, originalEvent }, root) {
+    if (!group) return;
+    const actionKey = group.actionKey || "";
+    const role = group.dataRole || "";
+    if (typeof dispatchUiAction === "function"){
+      const handled = dispatchUiAction(root, { role, actionKey, originalEvent });
+      if (handled) return;
+    }
+    if (!actionKey) return;
+    const target = resolveActionTarget(root, actionKey);
     if (!target) return;
     target.click();
   }
