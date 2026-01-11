@@ -879,7 +879,9 @@
     }
 
     if (resolvedViewBox && resolvedViewBox.width && resolvedViewBox.height) {
-      stage.setAttribute("viewBox", `0 0 ${Math.max(1, resolvedViewBox.width)} ${Math.max(1, resolvedViewBox.height)}`);
+      const viewBoxX = Number.isFinite(resolvedViewBox.x) ? resolvedViewBox.x : 0;
+      const viewBoxY = Number.isFinite(resolvedViewBox.y) ? resolvedViewBox.y : 0;
+      stage.setAttribute("viewBox", `${viewBoxX} ${viewBoxY} ${Math.max(1, resolvedViewBox.width)} ${Math.max(1, resolvedViewBox.height)}`);
     }
 
     const svgRoot = (stage instanceof SVGSVGElement) ? stage : stage.ownerSVGElement;
