@@ -203,13 +203,14 @@ END README
           <rect data-region="panels" x="0" y="430" width="1000" height="880"></rect>
           <rect data-region="footer" x="0" y="1310" width="1000" height="90"></rect>
         </svg>
+        <svg class="card-ui-svg" data-role="card-ui-svg" viewBox="0 0 1000 1400"></svg>
         <div class="tcg-card__content">
           <div class="card-header">
-            <div class="card-header__title">
+            <div class="card-header__title card-ui-html">
               <span data-role="card-title"></span>
               <span data-role="play-mini" class="card-header__status">stopped</span>
             </div>
-            <div class="card-header__badge card-header__controls">
+            <div class="card-header__badge card-header__controls card-ui-html">
               <button data-role="btn-play" class="card-control" type="button" title="Play/Pause preview" aria-label="Play or pause preview" aria-pressed="false">▶</button>
               <button data-role="btn-step" class="card-control" type="button" title="Step preview" aria-label="Step preview frame">⏭</button>
               <button data-role="btn-reset" class="card-control" type="button" title="Reset preview" aria-label="Reset preview">⟲</button>
@@ -231,7 +232,7 @@ END README
             <div class="card-type">
           <!-- TEMPLATE -->
           <section class="panel">
-          <h2>
+          <h2 class="card-ui-html" data-role="panel-heading-template">
             <span>Template Editor <span class="mini" data-role="tpl-root-mini"></span></span>
             <span class="kbar">
               <input data-role="file-template" type="file" accept=".json,application/json" />
@@ -293,7 +294,7 @@ END README
       <div class="card-text">
         <!-- RECIPE -->
         <section class="panel">
-        <h2>
+        <h2 class="card-ui-html" data-role="panel-heading-recipe">
           <span>Animation Recipe Builder <span class="mini" data-role="rec-root-mini"></span></span>
           <span class="kbar">
             <input data-role="file-recipe" type="file" accept=".json,application/json" />
@@ -355,7 +356,7 @@ END README
       <!-- TASKER -->
       <div class="card-task">
       <section class="panel">
-      <h2>
+      <h2 class="card-ui-html" data-role="panel-heading-task">
         <span>Tasker Manager <span class="mini" data-role="task-root-mini"></span></span>
         <span class="kbar">
           <input data-role="file-tasker" type="file" accept=".json,application/json" />
@@ -412,7 +413,7 @@ END README
       </div>
     </div>
     <div class="card-footer">
-      <div class="kbar">
+      <div class="kbar card-ui-html">
         <div class="toggle">
           <label title="Recompute IDs from canonical node content and rewrite references.">
             <input data-role="deterministic-ids" type="checkbox" checked />
@@ -464,6 +465,8 @@ END README
 </div>
   <template id="card-template"></template>
   <script defer src="js/01_utilities.js"></script>
+  <script defer src="js/atlas_svg_renderer.js"></script>
+  <script defer src="js/12_card_ui_svg.js"></script>
   <script defer src="js/00_run.js"></script>
   <script defer src="js/01_package_state.js"></script>
     <!-- PKG packages (offline registration) -->

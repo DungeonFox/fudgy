@@ -317,6 +317,7 @@
     root.dataset.cardId = safeId;
     const title = $role(root, "card-title");
     if (title) title.textContent = `Sprite Editor Deck · ${safeId}`;
+    if (typeof window.updateCardUiSvg === "function") window.updateCardUiSvg(root);
     const panelHosts = root.querySelectorAll(".card-adjacent, .card-adjacent [data-panel]");
     panelHosts.forEach((panelHost) => {
       panelHost.dataset.cardId = safeId;
@@ -386,6 +387,7 @@ function cloneCardTemplate(){
     initViewerGeometry(root);
     refreshAllUI(root);
     renderOnce(root);
+    if (typeof window.initCardUiSvg === "function") window.initCardUiSvg(root);
     if (typeof initCoreEvents === "function"){
       initCoreEvents(root);
     }

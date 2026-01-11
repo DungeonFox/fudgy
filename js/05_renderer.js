@@ -157,6 +157,7 @@
     btn.setAttribute("aria-pressed", isPlaying ? "true" : "false");
     btn.title = isPlaying ? "Pause preview" : "Play preview";
     btn.setAttribute("aria-label", isPlaying ? "Pause preview" : "Play preview");
+    if (typeof window.updateCardUiSvg === "function") window.updateCardUiSvg(root);
   }
 
   function getFrameDurationMs(plan, idx){
@@ -202,6 +203,7 @@ async function __renderOnceInner(root){
     }
     if (sizeInfo) sizeInfo.textContent = `${outW}×${outH}`;
     if (playMini) playMini.textContent = state.playing ? "playing" : "stopped";
+    if (typeof window.updateCardUiSvg === "function") window.updateCardUiSvg(root);
   
 }
 
