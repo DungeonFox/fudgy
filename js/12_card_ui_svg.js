@@ -9,6 +9,9 @@
 
   let cachedAtlas = null;
   let atlasPromise = null;
+  const validatedAtlases = new WeakSet();
+  const UI_FALLBACK_KEY = "U003F";
+  const UI_SPACE_KEY = "U0020";
 
   function resolveRoot(cardRoot) {
     if (typeof resolveCardRoot === "function") return resolveCardRoot(cardRoot);
@@ -77,6 +80,54 @@
     const input = root.querySelector('[data-role="deterministic-ids"]');
     const label = input ? input.closest("label") : null;
     return label ? (label.textContent || "").trim() : "";
+  }
+
+  function normalizeUiText(s) {
+    if (!s) return "";
+    s = s.replaceAll("\r\n", "\n");
+    s = s.replaceAll("\r", "\n");
+    s = s.split("“").join('"').split("”").join('"');
+    s = s.split("‘").join("'").split("’").join("'");
+    s = s.split("–").join("-").split("—").join("-");
+    s = s.split("…").join("...");
+    s = s.split("•").join("*").split("·").join("*");
+    s = s.split("\u00A0").join(" ");
+    return s;
+  }
+
+  function keyForChar(ch) {
+    const cp = ch.codePointAt(0);
+    const hex = cp.toString(16).toUpperCase().padStart(4, "0");
+    return "U" + hex;
+  }
+
+  function validateAtlasForGroups(groups, atlas) {
+    if (!atlas || !atlas.glyphs) return;
+    if (validatedAtlases.has(atlas)) return;
+    validatedAtlases.add(atlas);
+    const glyphs = atlas.glyphs;
+    const missing = new Set();
+
+    for (const group of (groups || [])) {
+      const text = normalizeUiText(group.text || "");
+      for (const ch of text) {
+        let normalized = ch;
+        if (normalized === "\t" || normalized === "\n") normalized = " ";
+        const key = keyForChar(normalized);
+        const glyph = glyphs[key];
+        if (!(glyph && glyph.svg && glyph.svg.pathD)) missing.add(key);
+      }
+    }
+
+    missing.add(UI_SPACE_KEY);
+    if (glyphs[UI_FALLBACK_KEY] && !(glyphs[UI_FALLBACK_KEY].svg && glyphs[UI_FALLBACK_KEY].svg.pathD)) {
+      missing.add(UI_FALLBACK_KEY);
+    }
+
+    if (missing.size) {
+      const list = Array.from(missing).sort().join(", ");
+      console.warn(`[card-ui-svg] Atlas missing svg.pathD for UI glyphs: ${list}.`);
+    }
   }
 
   function getViewBox(svg) {
@@ -770,6 +821,7 @@
     }
 
     const groups = buildGroups(root).concat(buildDomTextGroups(root));
+    validateAtlasForGroups(groups, atlas);
     renderer({
       svgEl: svg,
       atlas,

@@ -43,12 +43,29 @@
     return !!(g && g.svg && g.svg.pathD);
   }
 
+  const warnedMissingGlyphs = new Set();
+
+  function warnMissingGlyph(key, message) {
+    if (warnedMissingGlyphs.has(key)) return;
+    warnedMissingGlyphs.add(key);
+    const extra = message ? ` ${message}` : "";
+    console.warn(`[atlas-svg-renderer] Missing glyph svg.pathD for ${key}.${extra}`);
+  }
+
   function glyphForChar(ch, glyphs, fallbackKey, spaceKey) {
     if (ch === "\t") ch = " ";
     const key = keyForChar(ch);
     if (hasRenderableGlyph(key, glyphs)) return key;
-    if (hasRenderableGlyph(fallbackKey, glyphs)) return fallbackKey;
-    return glyphs[spaceKey] ? spaceKey : key;
+    if (hasRenderableGlyph(fallbackKey, glyphs)) {
+      warnMissingGlyph(key, `(using fallback ${fallbackKey})`);
+      return fallbackKey;
+    }
+    if (glyphs[spaceKey]) {
+      warnMissingGlyph(key, "(dropping glyph)");
+      return spaceKey;
+    }
+    warnMissingGlyph(key, "(dropping glyph)");
+    return key;
   }
 
   function isSpaceGlyphKey(key, spaceKey) {
@@ -356,6 +373,8 @@
             s: scale,
             opacity: group.opacity
           });
+        } else {
+          warnMissingGlyph(entry.key, "(dropping glyph)");
         }
 
         // advance
@@ -627,6 +646,8 @@
           s: scale,
           opacity: group.opacity
         });
+      } else {
+        warnMissingGlyph(entry.key, "(dropping glyph)");
       }
 
       const advUnits = (g.edges.L + g.edges.R);
