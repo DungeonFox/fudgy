@@ -205,7 +205,7 @@ END README
         </svg>
         <svg class="card-ui-svg" data-role="card-ui-svg" viewBox="0 0 1000 1400"></svg>
         <div class="tcg-card__content">
-          <div class="card-header">
+          <div class="card-header" data-ui-region="header">
             <div class="card-header__title">
               <span data-role="card-title" class="card-ui-html"></span>
               <span data-role="play-mini" class="card-header__status card-ui-html">stopped</span>
@@ -219,7 +219,7 @@ END README
               <button class="card-control card-control--toggle is-active" type="button" data-panel-toggle="log" aria-pressed="true" title="Toggle log panel" aria-label="Toggle log panel"><span class="card-ui-html">LOG</span></button>
             </div>
           </div>
-          <div class="card-image">
+          <div class="card-image" data-ui-region="image">
             <div class="card-image__frame">
               <canvas data-role="preview-canvas" width="256" height="256"></canvas>
               <div class="row card-image__meta" style="justify-content:space-between;">
@@ -228,7 +228,7 @@ END README
               </div>
             </div>
           </div>
-          <div class="card-panels">
+          <div class="card-panels" data-ui-region="panels">
             <div class="card-type">
           <!-- TEMPLATE -->
           <section class="panel">
@@ -412,7 +412,7 @@ END README
         </section>
       </div>
     </div>
-    <div class="card-footer">
+    <div class="card-footer" data-ui-region="footer">
       <div class="kbar card-ui-html">
         <div class="toggle">
           <label title="Recompute IDs from canonical node content and rewrite references.">

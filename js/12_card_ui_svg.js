@@ -228,8 +228,7 @@
     if (svg.parentElement !== layout) {
       layout.appendChild(svg);
     }
-    const layoutViewBox = layoutSvg ? layoutSvg.getAttribute("viewBox") : null;
-    svg.setAttribute("viewBox", layoutViewBox || "0 0 1000 1400");
+    svg.setAttribute("viewBox", "0 0 1000 1400");
     const preserve = layoutSvg ? layoutSvg.getAttribute("preserveAspectRatio") : null;
     if (preserve) {
       svg.setAttribute("preserveAspectRatio", preserve);
@@ -747,28 +746,64 @@
     const layoutSvg = root ? root.querySelector(".card-layout") : null;
     const viewBox = getViewBox(layoutSvg);
     if (!layout || !viewBox) return [];
-    const layoutRect = layout.getBoundingClientRect();
-    const layoutWidth = layoutRect.width || layout.clientWidth || 0;
-    const layoutHeight = layoutRect.height || layout.clientHeight || 0;
-    if (!layoutWidth || !layoutHeight) return [];
-    const scaleX = viewBox.width / layoutWidth;
-    const scaleY = viewBox.height / layoutHeight;
     const groups = [];
     let index = 0;
+
+    const metrics = getLayoutMetrics(root);
+    const regionFallback = {
+      x: viewBox.x || 0,
+      y: viewBox.y || 0,
+      width: viewBox.width,
+      height: viewBox.height
+    };
+
+    function findRegionContainer(el) {
+      if (!el) return null;
+      return el.closest("[data-ui-region]");
+    }
+
+    function getRegionForElement(el) {
+      const container = findRegionContainer(el);
+      const regionName = container ? container.getAttribute("data-ui-region") : null;
+      if (regionName && metrics[regionName]) {
+        return { name: regionName, rect: metrics[regionName], container };
+      }
+      return { name: "safe", rect: regionFallback, container: layout };
+    }
+
+    function getOffsetWithin(el, container) {
+      let x = 0;
+      let y = 0;
+      let node = el;
+      while (node && node !== container) {
+        x += node.offsetLeft || 0;
+        y += node.offsetTop || 0;
+        node = node.offsetParent;
+      }
+      return { x, y };
+    }
 
     getDomTextTargets(root).forEach((el) => {
       const explicit = el.getAttribute("data-ui-text");
       const text = (explicit !== null && explicit !== "") ? explicit : (el.textContent || "").trim();
       if (!text) return;
-      const rect = el.getBoundingClientRect();
-      if (!rect.width || !rect.height) return;
-      const x = viewBox.x + (rect.left - layoutRect.left) * scaleX;
-      const y = viewBox.y + (rect.top - layoutRect.top) * scaleY;
-      const width = rect.width * scaleX;
-      const height = rect.height * scaleY;
+      const { rect: region, container } = getRegionForElement(el);
+      if (!container) return;
+      const containerWidth = container.clientWidth || 0;
+      const containerHeight = container.clientHeight || 0;
+      if (!containerWidth || !containerHeight) return;
+      const offset = getOffsetWithin(el, container);
+      const elWidth = el.offsetWidth || 0;
+      const elHeight = el.offsetHeight || 0;
+      if (!elWidth || !elHeight) return;
+      const x = region.x + (offset.x / containerWidth) * region.width;
+      const y = region.y + (offset.y / containerHeight) * region.height;
+      const width = (elWidth / containerWidth) * region.width;
+      const height = (elHeight / containerHeight) * region.height;
       const style = window.getComputedStyle(el);
       const align = normalizeAlign(style.textAlign);
-      const lineHeightPx = parseLineHeightPx(style, rect.height);
+      const lineHeightPx = parseLineHeightPx(style, elHeight);
+      const scaleY = region.height / containerHeight;
       const lineHeight = lineHeightPx * scaleY;
       const maxLines = Math.max(1, Math.floor(height / Math.max(1, lineHeight)));
       const allowWrap = style.whiteSpace !== "nowrap" && maxLines > 1;
