@@ -624,6 +624,89 @@
     return buildGroupLayouts(root).map((def) => buildBaseGroup(def, def.textSource ? def.textSource(root) : ""));
   }
 
+  function getDomTextTargets(root) {
+    if (!root) return [];
+    const scope = root.querySelector(".tcg-card") || root;
+    return Array.from(scope.querySelectorAll("[data-ui-text]")).filter((el) => !el.closest(".card-ui-svg"));
+  }
+
+  function normalizeAlign(value) {
+    const align = (value || "").toLowerCase();
+    if (align === "center" || align === "right") return align;
+    if (align === "end") return "right";
+    return "left";
+  }
+
+  function parseLineHeightPx(style, fallbackPx) {
+    const raw = style ? parseFloat(style.lineHeight) : NaN;
+    if (Number.isFinite(raw)) return raw;
+    const fontSize = style ? parseFloat(style.fontSize) : NaN;
+    if (Number.isFinite(fontSize)) return fontSize * 1.2;
+    return fallbackPx;
+  }
+
+  function buildDomTextGroups(root) {
+    const layout = root ? root.querySelector(".tcg-card__layout") : null;
+    const layoutSvg = root ? root.querySelector(".card-layout") : null;
+    const viewBox = getViewBox(layoutSvg);
+    if (!layout || !viewBox) return [];
+    const layoutRect = layout.getBoundingClientRect();
+    if (!layoutRect.width || !layoutRect.height) return [];
+    const scaleX = viewBox.width / layoutRect.width;
+    const scaleY = viewBox.height / layoutRect.height;
+    const groups = [];
+    let index = 0;
+
+    getDomTextTargets(root).forEach((el) => {
+      const explicit = el.getAttribute("data-ui-text");
+      const text = (explicit !== null && explicit !== "") ? explicit : (el.textContent || "").trim();
+      if (!text) return;
+      const rect = el.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      const x = viewBox.x + (rect.left - layoutRect.left) * scaleX;
+      const y = viewBox.y + (rect.top - layoutRect.top) * scaleY;
+      const width = rect.width * scaleX;
+      const height = rect.height * scaleY;
+      const style = window.getComputedStyle(el);
+      const align = normalizeAlign(style.textAlign);
+      const lineHeightPx = parseLineHeightPx(style, rect.height);
+      const lineHeight = lineHeightPx * scaleY;
+      const maxLines = Math.max(1, Math.floor(height / Math.max(1, lineHeight)));
+      const allowWrap = style.whiteSpace !== "nowrap" && maxLines > 1;
+      const paddingPx = Math.max(1, Math.min(width, height) * 0.08);
+      const lineBottomOffsetsPx = Array.from({ length: maxLines }, (_, i) => (lineHeight * (i + 1)) - (height / 2));
+
+      groups.push({
+        id: `dom-text-${index}`,
+        name: el.getAttribute("data-ui-name") || `DOM Text ${index + 1}`,
+        originX: x + (width / 2),
+        originY: y + (height / 2),
+        areaL: width / 2,
+        areaR: width / 2,
+        areaT: height / 2,
+        areaB: height / 2,
+        paddingPx,
+        lineGapPx: 0,
+        trackingUnits: 12,
+        allowWrap,
+        maxLines,
+        breakLongWords: false,
+        lineBottomOffsetsPx,
+        align,
+        hOffsetPx: 0,
+        pixelSnap: true,
+        showGuides: false,
+        opacity: 1,
+        uiRole: "text",
+        contentAsButton: false,
+        text
+      });
+      index += 1;
+    });
+
+    return groups;
+  }
+
   function renderCardUiSvg(cardRoot) {
     const root = resolveRoot(cardRoot);
     if (!root) return;
@@ -638,7 +721,7 @@
       return;
     }
 
-    const groups = buildGroups(root);
+    const groups = buildGroups(root).concat(buildDomTextGroups(root));
     renderer({
       svgEl: svg,
       atlas,
