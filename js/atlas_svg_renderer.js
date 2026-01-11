@@ -793,8 +793,18 @@
     const fallbackKey = "U003F"; // '?'
     const spaceKey = "U0020";
 
-    if (viewBoxSize && viewBoxSize.width && viewBoxSize.height) {
-      stage.setAttribute("viewBox", `0 0 ${Math.max(1, viewBoxSize.width)} ${Math.max(1, viewBoxSize.height)}`);
+    let resolvedViewBox = viewBoxSize;
+    if (!resolvedViewBox || !Number.isFinite(resolvedViewBox.width) || !Number.isFinite(resolvedViewBox.height)) {
+      if (typeof stage.getBoundingClientRect === "function") {
+        const rect = stage.getBoundingClientRect();
+        if (rect && Number.isFinite(rect.width) && Number.isFinite(rect.height)) {
+          resolvedViewBox = { width: rect.width, height: rect.height };
+        }
+      }
+    }
+
+    if (resolvedViewBox && resolvedViewBox.width && resolvedViewBox.height) {
+      stage.setAttribute("viewBox", `0 0 ${Math.max(1, resolvedViewBox.width)} ${Math.max(1, resolvedViewBox.height)}`);
     }
 
     clearStage(stage);
