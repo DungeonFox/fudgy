@@ -2,11 +2,11 @@
 SPRITE HEX-GRAPH FLIPBOOK TOOL WITH TASKER (single-file, no deps)
 ================================================================
 
-This is an extended version of the Hex‑Graph Sprite Flipbook Tool. It retains the original template
-and recipe editors, registry system, pop‑out viewer and atlas exporter, and adds a new "Tasker"
-subsystem for automating the pop‑out viewer. Tasks live in a separate manifest (tasks.json) and are
+This is an extended version of the Hex-Graph Sprite Flipbook Tool. It retains the original template
+and recipe editors, registry system, pop-out viewer and atlas exporter, and adds a new "Tasker"
+subsystem for automating the pop-out viewer. Tasks live in a separate manifest (tasks.json) and are
 identified by stable hex IDs (namespace `tsk:`). A task is a list of commands executed sequentially
-with optional delays. Commands are sent to the pop‑out viewer via postMessage and can instruct the
+with optional delays. Commands are sent to the pop-out viewer via postMessage and can instruct the
 viewer to pause/play, jump to specific frames, toggle layer visibility, adjust layer opacity, or
 wait for a specified duration. Tasks can be loaded, edited and saved independently from templates
 and recipes.
@@ -55,20 +55,20 @@ ID: tsk:0x...
 }
 ```
 
-Commands supported by the built‑in viewer:
+Commands supported by the built-in viewer:
 
 * **play**: resumes playback.
 * **pause**: pauses playback.
-* **goToFrameIndex**: jumps to the specified frame index (0‑based). Frames are resolved from the
-  recipe’s frame list.
-* **setLayerVisibility**: toggles a layer’s `visible` flag. The `layer` field must reference a
+* **goToFrameIndex**: jumps to the specified frame index (0-based). Frames are resolved from the
+  recipe's frame list.
+* **setLayerVisibility**: toggles a layer's `visible` flag. The `layer` field must reference a
   layer ID (anim:0x...).
-* **setLayerOpacity**: sets a layer’s opacity (0..1). The `layer` field must reference a layer ID.
+* **setLayerOpacity**: sets a layer's opacity (0..1). The `layer` field must reference a layer ID.
 * **wait**: instructs the Tasker to wait the specified `duration` (in ms) before proceeding to
   the next command. Note: `wait` does not send anything to the viewer; it merely delays task
   execution.
 
-* **setWindowGeometry**: resizes and/or moves the pop‑out viewer window. It accepts optional
+* **setWindowGeometry**: resizes and/or moves the pop-out viewer window. It accepts optional
   `width`, `height`, `left` and `top` properties (numbers, in pixels). Any omitted property
   leaves that dimension or position unchanged. For example:
 
@@ -76,7 +76,7 @@ Commands supported by the built‑in viewer:
   { "cmd": "setWindowGeometry", "width": 640, "height": 480, "left": 200, "top": 100 }
   ```
 
-  When run as part of a task, this command asks the viewer to resize itself to 640×480 pixels
+  When run as part of a task, this command asks the viewer to resize itself to 640x480 pixels
   and move to screen coordinates (200,100). If only width/height are provided, the window stays
   anchored in its current position. If only left/top are provided, the size is preserved.
 
@@ -91,8 +91,8 @@ Commands supported by the built‑in viewer:
 CARD-SCOPED EXECUTION HELPER (run)
 --------------------------------------------------------------------------------
 
-Some UI handlers use a helper called `run(...)` to execute work in the *owner card’s* context.
-If `run` is missing, you’ll see: `Uncaught ReferenceError: run is not defined`.
+Some UI handlers use a helper called `run(...)` to execute work in the *owner card's* context.
+If `run` is missing, you'll see: `Uncaught ReferenceError: run is not defined`.
 
 Drop-in script: `js/00_run.js`
 
@@ -112,7 +112,7 @@ END README
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Hex‑Graph Sprite Flipbook Tool with Tasker</title>
+<title>Hex-Graph Sprite Flipbook Tool with Tasker</title>
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="styles_portals_autofit_patch.css">
 
@@ -148,8 +148,8 @@ END README
 </head>
 <body>
 <header>
-  <div class="title">Hex‑Graph Sprite Flipbook Tool</div>
-  <span class="pill">single‑file • offline • no deps</span>
+  <div class="title">Hex-Graph Sprite Flipbook Tool</div>
+  <span class="pill">single-file * offline * no deps</span>
   <span id="statusPill" class="pill">registry: 0 nodes</span>
   <button class="pill" type="button" data-role="btn-new-card">New Card</button>
   <div class="row">
@@ -177,7 +177,7 @@ END README
     <label class="tightLabel" title="Manual view scale (used when Auto-fit is off)">
       Zoom
       <input id="cardZoom" class="zoomRange" type="range" min="0.10" max="2.00" step="0.01" value="1.00" />
-      <span id="cardZoomOut" class="pill">1.00×</span>
+      <span id="cardZoomOut" class="pill">1.00x</span>
     </label>
 
     <label class="pill tightLabel" title="Derive layout regions from the card's SVG dieline so the content tracks size changes">
@@ -211,12 +211,12 @@ END README
               <span data-role="play-mini" class="card-header__status card-ui-html">stopped</span>
             </div>
             <div class="card-header__badge card-header__controls card-ui-html">
-              <button data-role="btn-play" class="card-control" type="button" title="Play/Pause preview" aria-label="Play or pause preview" aria-pressed="false">▶</button>
-              <button data-role="btn-step" class="card-control" type="button" title="Step preview" aria-label="Step preview frame">⏭</button>
-              <button data-role="btn-reset" class="card-control" type="button" title="Reset preview" aria-label="Reset preview">⟲</button>
+              <button data-role="btn-play" class="card-control" type="button" title="Play/Pause preview" aria-label="Play or pause preview" aria-pressed="false">&gt;</button>
+              <button data-role="btn-step" class="card-control" type="button" title="Step preview" aria-label="Step preview frame">&gt;&gt;</button>
+              <button data-role="btn-reset" class="card-control" type="button" title="Reset preview" aria-label="Reset preview">RST</button>
               <span class="card-header__divider" aria-hidden="true"></span>
-              <button class="card-control card-control--toggle is-active" type="button" data-panel-toggle="registry" aria-pressed="true" title="Toggle registry panel" aria-label="Toggle registry panel">🗂</button>
-              <button class="card-control card-control--toggle is-active" type="button" data-panel-toggle="log" aria-pressed="true" title="Toggle log panel" aria-label="Toggle log panel">📜</button>
+              <button class="card-control card-control--toggle is-active" type="button" data-panel-toggle="registry" aria-pressed="true" title="Toggle registry panel" aria-label="Toggle registry panel">REG</button>
+              <button class="card-control card-control--toggle is-active" type="button" data-panel-toggle="log" aria-pressed="true" title="Toggle log panel" aria-label="Toggle log panel">LOG</button>
             </div>
           </div>
           <div class="card-image">
@@ -249,7 +249,7 @@ END README
                 </div>
               </div>
               <div class="field">
-                <label>gridW / gridH (output size = tileW×gridW by tileH×gridH)</label>
+                <label>gridW / gridH (output size = tileW x gridW by tileH x gridH)</label>
                 <div class="row">
                   <input data-role="tpl-grid-w" type="number" min="1" step="1" />
                   <input data-role="tpl-grid-h" type="number" min="1" step="1" />
@@ -303,7 +303,7 @@ END README
         </h2>
         <div class="content" data-role="recipe-panel">
           <div class="field">
-            <label>Recipe → Template Root</label>
+            <label>Recipe -> Template Root</label>
             <select data-role="recipe-template-select"></select>
             <div class="small muted" style="margin-top:6px">
               This recipe renders using the selected Template root node.
@@ -368,7 +368,7 @@ END README
         <div class="row" style="justify-content:space-between; align-items:flex-end;">
           <div>
             <div class="muted small">Tasks</div>
-            <div class="small muted">Define tasks that control the pop‑out viewer.</div>
+            <div class="small muted">Define tasks that control the pop-out viewer.</div>
           </div>
           <div class="row">
             <button data-role="btn-add-task"><span class="card-ui-html" data-ui-text>+ Task</span></button>
@@ -391,11 +391,11 @@ END README
           </div>
         </div>
 
-        <!-- Pop‑out viewer geometry controls -->
+        <!-- Pop-out viewer geometry controls -->
         <div class="hr"></div>
         <div class="field">
-          <label>Pop‑out Viewer Geometry</label>
-          <div class="small muted">Configure the default size and screen position of the pop‑out viewer. These values are used when opening a new viewer and can be applied to an open viewer at any time.</div>
+          <label>Pop-out Viewer Geometry</label>
+          <div class="small muted">Configure the default size and screen position of the pop-out viewer. These values are used when opening a new viewer and can be applied to an open viewer at any time.</div>
           <div class="row" style="flex-wrap:wrap; gap:8px; margin-top:6px">
             <label style="font-size:11px">W</label>
             <input data-role="popout-width" type="number" min="100" step="10" style="width:70px" aria-label="Pop-out width" />
@@ -421,7 +421,7 @@ END README
           </label>
         </div>
         <button data-role="btn-rehash" class="primary" title="Recompute IDs topologically; rewrite references; clears caches.">Recompute IDs</button>
-        <button data-role="btn-popout" class="primary">Pop‑out Viewer</button>
+        <button data-role="btn-popout" class="primary">Pop-out Viewer</button>
         <button data-role="btn-export-atlas" class="primary">Export Atlas PNG + JSON</button>
       </div>
     </div>
@@ -2346,7 +2346,7 @@ END README
 
       ui.zoom.disabled = !!state.autoFit;
       ui.zoom.value = String(clamp(state.autoFit ? computeAutoFitZoom(state) : state.zoom, 0.05, 10));
-      ui.zoomOut.textContent = `${(state.autoFit ? computeAutoFitZoom(state) : state.zoom).toFixed(2)}×`;
+      ui.zoomOut.textContent = `${(state.autoFit ? computeAutoFitZoom(state) : state.zoom).toFixed(2)}x`;
     };
 
     const readFromUi = () => {
@@ -2376,7 +2376,7 @@ END README
       state.zoom = clamp(num(ui.zoom.value, state.zoom), 0.05, 10);
       storeState(state);
       if(!state.autoFit){
-        ui.zoomOut.textContent = `${state.zoom.toFixed(2)}×`;
+        ui.zoomOut.textContent = `${state.zoom.toFixed(2)}x`;
         const cards = document.querySelectorAll(".tcg-card");
         cards.forEach(card => updateCardLayout_portal(card, state));
       }

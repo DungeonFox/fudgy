@@ -153,7 +153,7 @@
     const root = resolveCardRoot(cardRoot);
     const btn = root ? $role(root, "btn-play") : null;
     if (!btn) return;
-    btn.textContent = isPlaying ? "⏸" : "▶";
+    btn.textContent = isPlaying ? "||" : ">";
     btn.setAttribute("aria-pressed", isPlaying ? "true" : "false");
     btn.title = isPlaying ? "Pause preview" : "Play preview";
     btn.setAttribute("aria-label", isPlaying ? "Pause preview" : "Play preview");
@@ -201,7 +201,7 @@ async function __renderOnceInner(root){
     if (frameInfo){
       frameInfo.textContent = `${state.curFrame}/${Math.max(0,plan.frames.length-1)}  ${fname}  (${getFrameDurationMs(plan,state.curFrame)}ms)`;
     }
-    if (sizeInfo) sizeInfo.textContent = `${outW}×${outH}`;
+    if (sizeInfo) sizeInfo.textContent = `${outW}x${outH}`;
     if (playMini) playMini.textContent = state.playing ? "playing" : "stopped";
     if (typeof window.updateCardUiSvg === "function") window.updateCardUiSvg(root);
   

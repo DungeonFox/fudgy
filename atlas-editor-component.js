@@ -90,7 +90,7 @@
   if (typeof renderAtlasGroups !== "function") throw new Error("AtlasEditor: missing renderAtlasGroups (load js/atlas_svg_renderer.js)");
 
   const badge = byId("fontBadge");
-  badge.textContent = `${ATLAS.font.family} — unitsPerEm=${ATLAS.font.unitsPerEm} (ASCII demo)`;
+  badge.textContent = `${ATLAS.font.family} - unitsPerEm=${ATLAS.font.unitsPerEm} (ASCII demo)`;
 
   function render() {
     const globalGuides = byId("globalGuides").checked;
@@ -139,7 +139,7 @@
       opacity: 1,
       uiRole: "text",
       contentAsButton: false,
-      text: "CHEST OF STARS — TEST TITLE"
+      text: "CHEST OF STARS - TEST TITLE"
     },
     {
       id: "rules",
@@ -199,7 +199,7 @@
       opacity: 0.9,
       uiRole: "text",
       contentAsButton: false,
-      text: "“The map is not the territory— but it does make a great treasure.”"
+      text: "\"The map is not the territory- but it does make a great treasure.\""
     }
   ];
 
@@ -280,7 +280,7 @@
   }
 
   function newDefaultGroup() {
-    // Reasonable defaults (matching the demo groups) — tweak as needed.
+    // Reasonable defaults (matching the demo groups) - tweak as needed.
     return {
       id: uniqueGroupId("group"),
       name: `Group ${GROUPS.length + 1}`,

@@ -91,8 +91,9 @@
   }
 
   function resolveGlyphEntry(key, glyphs, fallbackKey) {
+    if (hasRenderableGlyph(key, glyphs)) return { key, glyph: glyphs[key] };
+    if (hasRenderableGlyph(fallbackKey, glyphs)) return { key: fallbackKey, glyph: glyphs[fallbackKey] };
     if (glyphs[key]) return { key, glyph: glyphs[key] };
-    if (glyphs[fallbackKey]) return { key: fallbackKey, glyph: glyphs[fallbackKey] };
     return null;
   }
 
