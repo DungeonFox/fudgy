@@ -5,13 +5,75 @@
   const PANELS = { top: 430, height: 880, gap: 20 };
   const FOOTER = { top: 1310, height: 90 };
 
+  let cachedAtlas = null;
+  let atlasPromise = null;
+
   function resolveRoot(cardRoot) {
     if (typeof resolveCardRoot === "function") return resolveCardRoot(cardRoot);
     return cardRoot;
   }
 
+  function parseAtlasJson(raw) {
+    if (!raw) return null;
+    try {
+      return JSON.parse(raw);
+    } catch (err) {
+      console.warn("[card-ui-svg] Failed to parse font atlas JSON.", err);
+      return null;
+    }
+  }
+
+  function loadUiAtlasOnce() {
+    if (cachedAtlas) return Promise.resolve(cachedAtlas);
+    const existing = window.cardUiAtlas || window.CARD_UI_ATLAS || window.uiAtlas;
+    if (existing) {
+      cachedAtlas = existing;
+      return Promise.resolve(existing);
+    }
+    if (atlasPromise) return atlasPromise;
+
+    atlasPromise = new Promise((resolve) => {
+      const script = document.getElementById("font-atlas");
+      if (!script) {
+        resolve(null);
+        return;
+      }
+      const inline = (script.textContent || "").trim();
+      if (inline) {
+        const parsed = parseAtlasJson(inline);
+        cachedAtlas = parsed;
+        if (parsed) window.cardUiAtlas = parsed;
+        resolve(parsed);
+        return;
+      }
+
+      const src = script.getAttribute("src") || script.dataset.src;
+      if (!src) {
+        resolve(null);
+        return;
+      }
+
+      fetch(src)
+        .then((res) => {
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          return res.json();
+        })
+        .then((data) => {
+          cachedAtlas = data;
+          if (data) window.cardUiAtlas = data;
+          resolve(data);
+        })
+        .catch((err) => {
+          console.warn("[card-ui-svg] Failed to load font atlas.", err);
+          resolve(null);
+        });
+    });
+
+    return atlasPromise;
+  }
+
   function getUiAtlas() {
-    return window.cardUiAtlas || window.CARD_UI_ATLAS || window.uiAtlas || null;
+    return cachedAtlas || window.cardUiAtlas || window.CARD_UI_ATLAS || window.uiAtlas || null;
   }
 
   function textFromSelector(root, selector) {
@@ -529,4 +591,10 @@
   window.updateCardUiSvg = function updateCardUiSvg(cardRoot) {
     renderCardUiSvg(cardRoot);
   };
+
+  loadUiAtlasOnce().then((atlas) => {
+    if (!atlas) return;
+    const shells = document.querySelectorAll(".card-shell");
+    shells.forEach((root) => renderCardUiSvg(root));
+  });
 })();
