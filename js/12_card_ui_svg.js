@@ -1,6 +1,8 @@
 (() => {
   const BASE_VIEWBOX = { width: 1000, height: 1400 };
   const BASE_HEADER = { x: 0, y: 0, width: 1000, height: 130 };
+  const BASE_SECTION_GAP = { x: 0, y: 130, width: 1000, height: 20 };
+  const BASE_IMAGE = { x: 0, y: 150, width: 1000, height: 280 };
   const BASE_PANELS = { x: 0, y: 430, width: 1000, height: 880 };
   const BASE_FOOTER = { x: 0, y: 1310, width: 1000, height: 90 };
   const BASE_PANEL_GAP = 20;
@@ -126,6 +128,18 @@
       width: viewBox.width,
       height: BASE_HEADER.height * scaleY
     };
+    const fallbackSectionGap = {
+      x: viewBox.x || 0,
+      y: (viewBox.y || 0) + BASE_SECTION_GAP.y * scaleY,
+      width: viewBox.width,
+      height: BASE_SECTION_GAP.height * scaleY
+    };
+    const fallbackImage = {
+      x: viewBox.x || 0,
+      y: (viewBox.y || 0) + BASE_IMAGE.y * scaleY,
+      width: viewBox.width,
+      height: BASE_IMAGE.height * scaleY
+    };
     const fallbackPanels = {
       x: viewBox.x || 0,
       y: (viewBox.y || 0) + BASE_PANELS.y * scaleY,
@@ -140,9 +154,9 @@
     };
     return {
       viewBox,
-      scaleX,
-      scaleY,
       header: getRegionRect(svg, "header", fallbackHeader),
+      sectionGap: getRegionRect(svg, "section-gap", fallbackSectionGap),
+      image: getRegionRect(svg, "image", fallbackImage),
       panels: getRegionRect(svg, "panels", fallbackPanels),
       footer: getRegionRect(svg, "footer", fallbackFooter),
       panelGap: BASE_PANEL_GAP * scaleY
@@ -206,29 +220,36 @@
 
   function buildGroupLayouts(root) {
     const metrics = getLayoutMetrics(root);
-    const { scaleX, scaleY, header, panels, footer } = metrics;
-    const headerButtonWidth = 44 * scaleX;
-    const headerButtonHeight = 44 * scaleY;
-    const headerButtonGap = 10 * scaleX;
+    const { header, panels, footer } = metrics;
+    const headerScaleX = header.width / BASE_HEADER.width;
+    const headerScaleY = header.height / BASE_HEADER.height;
+    const panelsScaleX = panels.width / BASE_PANELS.width;
+    const panelsScaleY = panels.height / BASE_PANELS.height;
+    const footerScaleX = footer.width / BASE_FOOTER.width;
+    const footerScaleY = footer.height / BASE_FOOTER.height;
+    const headerButtonWidth = 44 * headerScaleX;
+    const headerButtonHeight = 44 * headerScaleY;
+    const headerButtonGap = 10 * headerScaleX;
     const headerButtonTotalWidth = (headerButtonWidth * 5) + (headerButtonGap * 4);
-    const headerButtonStartX = header.x + header.width - (40 * scaleX) - headerButtonTotalWidth;
+    const headerButtonStartX = header.x + header.width - (40 * headerScaleX) - headerButtonTotalWidth;
     const headerButtonCenterY = header.y + (header.height / 2);
 
-    const footerButtonHeight = 52 * scaleY;
-    const footerButtonGap = 14 * scaleX;
-    const footerButtonWidths = [210, 190, 180, 220].map((width) => width * scaleX);
+    const footerButtonHeight = 52 * footerScaleY;
+    const footerButtonGap = 14 * footerScaleX;
+    const footerButtonWidths = [210, 190, 180, 220].map((width) => width * footerScaleX);
     const footerButtonTotalWidth = footerButtonWidths.reduce((sum, w) => sum + w, 0) + footerButtonGap * (footerButtonWidths.length - 1);
     const footerButtonStartX = footer.x + (footer.width - footerButtonTotalWidth) / 2;
     const footerButtonTop = footer.y + (footer.height - footerButtonHeight) / 2;
 
-    const panelSectionHeight = (panels.height - (metrics.panelGap * 2)) / 3;
-    const panelHeadingYOffset = 32 * scaleY;
-    const headerTitleOriginX = header.x + 60 * scaleX;
-    const headerTitleOriginY = header.y + header.height * (70 / 130);
-    const headerTitleLeft = header.x + 20 * scaleX;
-    const headerTitleRight = headerButtonStartX - (20 * scaleX);
-    const headerTitleAreaR = Math.max(60 * scaleX, headerTitleRight - headerTitleOriginX);
-    const headerTitleAreaL = Math.max(20 * scaleX, headerTitleOriginX - headerTitleLeft);
+    const panelGap = BASE_PANEL_GAP * panelsScaleY;
+    const panelSectionHeight = (panels.height - (panelGap * 2)) / 3;
+    const panelHeadingYOffset = 32 * panelsScaleY;
+    const headerTitleOriginX = header.x + 60 * headerScaleX;
+    const headerTitleOriginY = header.y + header.height * (70 / BASE_HEADER.height);
+    const headerTitleLeft = header.x + 20 * headerScaleX;
+    const headerTitleRight = headerButtonStartX - (20 * headerScaleX);
+    const headerTitleAreaR = Math.max(60 * headerScaleX, headerTitleRight - headerTitleOriginX);
+    const headerTitleAreaL = Math.max(20 * headerScaleX, headerTitleOriginX - headerTitleLeft);
 
     return [
       {
@@ -238,9 +259,9 @@
         originY: headerTitleOriginY,
         areaL: headerTitleAreaL,
         areaR: headerTitleAreaR,
-        areaT: 40 * scaleY,
-        areaB: 40 * scaleY,
-        paddingPx: 8 * scaleX,
+        areaT: 40 * headerScaleY,
+        areaB: 40 * headerScaleY,
+        paddingPx: 8 * headerScaleX,
         lineGapPx: 0,
         trackingUnits: 18,
         allowWrap: false,
@@ -261,11 +282,11 @@
         name: "Header Status",
         originX: header.x + header.width * 0.68,
         originY: headerTitleOriginY,
-        areaL: 60 * scaleX,
-        areaR: 120 * scaleX,
-        areaT: 30 * scaleY,
-        areaB: 30 * scaleY,
-        paddingPx: 6 * scaleX,
+        areaL: 60 * headerScaleX,
+        areaR: 120 * headerScaleX,
+        areaT: 30 * headerScaleY,
+        areaB: 30 * headerScaleY,
+        paddingPx: 6 * headerScaleX,
         lineGapPx: 0,
         trackingUnits: 16,
         allowWrap: false,
@@ -293,7 +314,7 @@
         areaR: headerButtonWidth / 2,
         areaT: headerButtonHeight / 2,
         areaB: headerButtonHeight / 2,
-        paddingPx: 8 * scaleX,
+        paddingPx: 8 * headerScaleX,
         lineGapPx: 0,
         trackingUnits: 12,
         allowWrap: false,
@@ -320,7 +341,7 @@
         areaR: headerButtonWidth / 2,
         areaT: headerButtonHeight / 2,
         areaB: headerButtonHeight / 2,
-        paddingPx: 8 * scaleX,
+        paddingPx: 8 * headerScaleX,
         lineGapPx: 0,
         trackingUnits: 12,
         allowWrap: false,
@@ -347,7 +368,7 @@
         areaR: headerButtonWidth / 2,
         areaT: headerButtonHeight / 2,
         areaB: headerButtonHeight / 2,
-        paddingPx: 8 * scaleX,
+        paddingPx: 8 * headerScaleX,
         lineGapPx: 0,
         trackingUnits: 12,
         allowWrap: false,
@@ -373,7 +394,7 @@
         areaR: headerButtonWidth / 2,
         areaT: headerButtonHeight / 2,
         areaB: headerButtonHeight / 2,
-        paddingPx: 8 * scaleX,
+        paddingPx: 8 * headerScaleX,
         lineGapPx: 0,
         trackingUnits: 12,
         allowWrap: false,
@@ -399,7 +420,7 @@
         areaR: headerButtonWidth / 2,
         areaT: headerButtonHeight / 2,
         areaB: headerButtonHeight / 2,
-        paddingPx: 8 * scaleX,
+        paddingPx: 8 * headerScaleX,
         lineGapPx: 0,
         trackingUnits: 12,
         allowWrap: false,
@@ -417,13 +438,13 @@
       {
         id: "panel-template-heading",
         name: "Template Heading",
-        originX: panels.x + 60 * scaleX,
+        originX: panels.x + 60 * panelsScaleX,
         originY: panels.y + panelHeadingYOffset,
-        areaL: 20 * scaleX,
-        areaR: 920 * scaleX,
-        areaT: 24 * scaleY,
-        areaB: 24 * scaleY,
-        paddingPx: 8 * scaleX,
+        areaL: 20 * panelsScaleX,
+        areaR: 920 * panelsScaleX,
+        areaT: 24 * panelsScaleY,
+        areaB: 24 * panelsScaleY,
+        paddingPx: 8 * panelsScaleX,
         lineGapPx: 0,
         trackingUnits: 14,
         allowWrap: false,
@@ -442,13 +463,13 @@
       {
         id: "panel-recipe-heading",
         name: "Recipe Heading",
-        originX: panels.x + 60 * scaleX,
-        originY: panels.y + panelSectionHeight + metrics.panelGap + panelHeadingYOffset,
-        areaL: 20 * scaleX,
-        areaR: 920 * scaleX,
-        areaT: 24 * scaleY,
-        areaB: 24 * scaleY,
-        paddingPx: 8 * scaleX,
+        originX: panels.x + 60 * panelsScaleX,
+        originY: panels.y + panelSectionHeight + panelGap + panelHeadingYOffset,
+        areaL: 20 * panelsScaleX,
+        areaR: 920 * panelsScaleX,
+        areaT: 24 * panelsScaleY,
+        areaB: 24 * panelsScaleY,
+        paddingPx: 8 * panelsScaleX,
         lineGapPx: 0,
         trackingUnits: 14,
         allowWrap: false,
@@ -467,13 +488,13 @@
       {
         id: "panel-task-heading",
         name: "Task Heading",
-        originX: panels.x + 60 * scaleX,
-        originY: panels.y + (panelSectionHeight * 2) + (metrics.panelGap * 2) + panelHeadingYOffset,
-        areaL: 20 * scaleX,
-        areaR: 920 * scaleX,
-        areaT: 24 * scaleY,
-        areaB: 24 * scaleY,
-        paddingPx: 8 * scaleX,
+        originX: panels.x + 60 * panelsScaleX,
+        originY: panels.y + (panelSectionHeight * 2) + (panelGap * 2) + panelHeadingYOffset,
+        areaL: 20 * panelsScaleX,
+        areaR: 920 * panelsScaleX,
+        areaT: 24 * panelsScaleY,
+        areaB: 24 * panelsScaleY,
+        paddingPx: 8 * panelsScaleX,
         lineGapPx: 0,
         trackingUnits: 14,
         allowWrap: false,
@@ -501,7 +522,7 @@
         areaR: footerButtonWidths[0] / 2,
         areaT: footerButtonHeight / 2,
         areaB: footerButtonHeight / 2,
-        paddingPx: 8 * scaleX,
+        paddingPx: 8 * footerScaleX,
         lineGapPx: 0,
         trackingUnits: 12,
         allowWrap: false,
@@ -528,7 +549,7 @@
         areaR: footerButtonWidths[1] / 2,
         areaT: footerButtonHeight / 2,
         areaB: footerButtonHeight / 2,
-        paddingPx: 8 * scaleX,
+        paddingPx: 8 * footerScaleX,
         lineGapPx: 0,
         trackingUnits: 12,
         allowWrap: false,
@@ -555,7 +576,7 @@
         areaR: footerButtonWidths[2] / 2,
         areaT: footerButtonHeight / 2,
         areaB: footerButtonHeight / 2,
-        paddingPx: 8 * scaleX,
+        paddingPx: 8 * footerScaleX,
         lineGapPx: 0,
         trackingUnits: 12,
         allowWrap: false,
@@ -582,7 +603,7 @@
         areaR: footerButtonWidths[3] / 2,
         areaT: footerButtonHeight / 2,
         areaB: footerButtonHeight / 2,
-        paddingPx: 8 * scaleX,
+        paddingPx: 8 * footerScaleX,
         lineGapPx: 0,
         trackingUnits: 12,
         allowWrap: false,
