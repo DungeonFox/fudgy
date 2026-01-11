@@ -3,6 +3,7 @@
 */
 (function() {
   const NS = "http://www.w3.org/2000/svg";
+  let defsPrefixCounter = 0;
 
   function svgEl(name) {
     return document.createElementNS(NS, name);
@@ -508,21 +509,31 @@
     stage.appendChild(l);
   }
 
-  function buildDefs(stage, glyphs, glyphKeys) {
-    const prior = stage.querySelector("defs[data-atlas-defs=\"true\"]");
+  function ensureDefsPrefix(svgRoot) {
+    const existing = svgRoot.getAttribute("data-atlas-defs-prefix");
+    if (existing) return existing;
+    defsPrefixCounter += 1;
+    const prefix = `atlas-glyph-${defsPrefixCounter}-`;
+    svgRoot.setAttribute("data-atlas-defs-prefix", prefix);
+    return prefix;
+  }
+
+  function buildDefs(svgRoot, glyphs, glyphKeys, defsPrefix) {
+    const prior = svgRoot.querySelector("defs[data-atlas-defs=\"true\"]");
     if (prior) prior.remove();
     const defs = svgEl("defs");
     defs.setAttribute("data-atlas-defs", "true");
+    defs.setAttribute("data-atlas-defs-prefix", defsPrefix);
     const keys = glyphKeys && glyphKeys.size ? Array.from(glyphKeys) : Object.keys(glyphs);
     for (const key of keys) {
       const g = glyphs[key];
       if (!g.svg || !g.svg.pathD) continue;
       const p = svgEl("path");
-      p.setAttribute("id", key);
+      p.setAttribute("id", defsPrefix + key);
       p.setAttribute("d", g.svg.pathD);
       defs.appendChild(p);
     }
-    stage.appendChild(defs);
+    svgRoot.appendChild(defs);
   }
 
   function collectReferencedGlyphKeys(groups, glyphs, fallbackKey, spaceKey) {
@@ -685,7 +696,7 @@
 
     for (const pl of layout.placements) {
       const use = svgEl("use");
-      use.setAttribute("href", "#" + pl.key);
+      use.setAttribute("href", "#" + opts.defsPrefix + pl.key);
       use.setAttribute("transform", `translate(${pl.x} ${pl.y}) scale(${pl.s})`);
       use.setAttribute("fill", "rgba(235,240,255,.95)");
       use.setAttribute("opacity", String(pl.opacity));
@@ -834,7 +845,7 @@
       if (lbl.ok) {
         for (const pl of lbl.placements) {
           const use = svgEl("use");
-          use.setAttribute("href", "#" + pl.key);
+          use.setAttribute("href", "#" + opts.defsPrefix + pl.key);
           use.setAttribute("transform", `translate(${pl.x} ${pl.y}) scale(${pl.s})`);
           use.setAttribute("fill", "rgba(235,240,255,.95)");
           use.setAttribute("opacity", String(pl.opacity));
@@ -911,7 +922,8 @@
     verifyGlyphCoverage(groups, glyphs, fallbackKey, spaceKey);
     clearStage(stage);
     const referencedKeys = collectReferencedGlyphKeys(groups, glyphs, fallbackKey, spaceKey);
-    buildDefs(svgRoot, glyphs, referencedKeys);
+    const defsPrefix = ensureDefsPrefix(svgRoot);
+    buildDefs(svgRoot, glyphs, referencedKeys, defsPrefix);
 
     const opts = {
       stage,
@@ -920,7 +932,8 @@
       spaceKey,
       onGroupAction,
       globalGuides,
-      selectedGroupId
+      selectedGroupId,
+      defsPrefix
     };
 
     const groupElements = new Map();
