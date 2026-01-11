@@ -38,10 +38,17 @@
     return "U" + hex;
   }
 
+  function hasRenderableGlyph(key, glyphs) {
+    const g = glyphs[key];
+    return !!(g && g.svg && g.svg.pathD);
+  }
+
   function glyphForChar(ch, glyphs, fallbackKey, spaceKey) {
     if (ch === "\t") ch = " ";
     const key = keyForChar(ch);
-    return glyphs[key] ? key : (glyphs[fallbackKey] ? fallbackKey : (glyphs[spaceKey] ? spaceKey : key));
+    if (hasRenderableGlyph(key, glyphs)) return key;
+    if (hasRenderableGlyph(fallbackKey, glyphs)) return fallbackKey;
+    return glyphs[spaceKey] ? spaceKey : key;
   }
 
   function isSpaceGlyphKey(key, spaceKey) {
@@ -83,36 +90,44 @@
     return tokens;
   }
 
-  function glyphWidthUnits(key, glyphs) {
-    const g = glyphs[key];
-    return (g.edges.L + g.edges.R);
+  function resolveGlyphEntry(key, glyphs, fallbackKey) {
+    if (glyphs[key]) return { key, glyph: glyphs[key] };
+    if (glyphs[fallbackKey]) return { key: fallbackKey, glyph: glyphs[fallbackKey] };
+    return null;
   }
 
-  function glyphHeightUnits(key, glyphs) {
-    const g = glyphs[key];
-    return (g.edges.T + g.edges.B);
+  function glyphWidthUnits(key, glyphs, fallbackKey) {
+    const entry = resolveGlyphEntry(key, glyphs, fallbackKey);
+    if (!entry || !entry.glyph.edges) return 0;
+    return (entry.glyph.edges.L + entry.glyph.edges.R);
+  }
+
+  function glyphHeightUnits(key, glyphs, fallbackKey) {
+    const entry = resolveGlyphEntry(key, glyphs, fallbackKey);
+    if (!entry || !entry.glyph.edges) return 0;
+    return (entry.glyph.edges.T + entry.glyph.edges.B);
   }
 
   // Measure a flat glyph list in units (tracking applied between glyphs, not after last)
-  function measureGlyphRunUnits(glyphKeys, trackingUnits, glyphs, spaceKey) {
+  function measureGlyphRunUnits(glyphKeys, trackingUnits, glyphs, fallbackKey, spaceKey) {
     let w = 0;
     let h = 0;
     let nonSpaceH = 0;
     for (let i = 0; i < glyphKeys.length; i++) {
       const key = glyphKeys[i];
-      w += glyphWidthUnits(key, glyphs);
+      w += glyphWidthUnits(key, glyphs, fallbackKey);
       if (i !== glyphKeys.length - 1) w += trackingUnits;
       if (!isSpaceGlyphKey(key, spaceKey)) {
-        nonSpaceH = Math.max(nonSpaceH, glyphHeightUnits(key, glyphs));
+        nonSpaceH = Math.max(nonSpaceH, glyphHeightUnits(key, glyphs, fallbackKey));
       }
-      h = Math.max(h, glyphHeightUnits(key, glyphs));
+      h = Math.max(h, glyphHeightUnits(key, glyphs, fallbackKey));
     }
     // For line height, use non-space height when possible (keeps multiple spaces from inflating line height)
     return { width: w, height: (nonSpaceH || h) };
   }
 
   // Split a too-wide word token into smaller word tokens (character fallback)
-  function splitWordToken(wordToken, maxWidthUnits, trackingUnits, glyphs, spaceKey) {
+  function splitWordToken(wordToken, maxWidthUnits, trackingUnits, glyphs, fallbackKey, spaceKey) {
     const parts = [];
     const keys = wordToken.glyphKeys;
     let start = 0;
@@ -124,7 +139,7 @@
 
       while (end < keys.length) {
         run.push(keys[end]);
-        const m = measureGlyphRunUnits(run, trackingUnits, glyphs, spaceKey);
+        const m = measureGlyphRunUnits(run, trackingUnits, glyphs, fallbackKey, spaceKey);
         if (m.width <= maxWidthUnits) {
           best = end + 1;
           end++;
@@ -146,7 +161,7 @@
   }
 
   // Wrap tokens into lines (each line becomes a flat glyph list)
-  function wrapToLines(tokens, maxWidthUnits, trackingUnits, maxLines, breakLongWords, glyphs, spaceKey) {
+  function wrapToLines(tokens, maxWidthUnits, trackingUnits, maxLines, breakLongWords, glyphs, fallbackKey, spaceKey) {
     const lines = [];
     let lineKeys = [];
 
@@ -161,7 +176,7 @@
 
     function lineWidthIfAppended(keysToAppend) {
       const combined = lineKeys.concat(keysToAppend);
-      return measureGlyphRunUnits(combined, trackingUnits, glyphs, spaceKey).width;
+      return measureGlyphRunUnits(combined, trackingUnits, glyphs, fallbackKey, spaceKey).width;
     }
 
     let ti = 0;
@@ -186,10 +201,10 @@
 
       // If token is a word too wide for an empty line, split (optional)
       if (t.type === "word" && !lineKeys.length) {
-        const m = measureGlyphRunUnits(tokenKeys, trackingUnits, glyphs, spaceKey);
+        const m = measureGlyphRunUnits(tokenKeys, trackingUnits, glyphs, fallbackKey, spaceKey);
         if (m.width > maxWidthUnits) {
           if (breakLongWords) {
-            const parts = splitWordToken(t, maxWidthUnits, trackingUnits, glyphs, spaceKey);
+            const parts = splitWordToken(t, maxWidthUnits, trackingUnits, glyphs, fallbackKey, spaceKey);
             // Replace this token with its parts in the stream
             tokens.splice(ti, 1, ...parts);
             continue; // reprocess at same index
@@ -223,7 +238,7 @@
   }
 
   // Check whether lines can be placed at fixed bottoms, inside the group area.
-  function linesFitFixedBottoms(lines, bottomsPx, area, paddingPx, gapPx, scale, trackingUnits, glyphs, spaceKey) {
+  function linesFitFixedBottoms(lines, bottomsPx, area, paddingPx, gapPx, scale, trackingUnits, glyphs, fallbackKey, spaceKey) {
     const usableTop = area.top + paddingPx;
     const usableBottom = area.bottom - paddingPx;
 
@@ -232,7 +247,7 @@
       const bottom = bottomsPx[i];
 
       if (bottom > usableBottom) return false;
-      const m = measureGlyphRunUnits(lineKeys, trackingUnits, glyphs, spaceKey);
+      const m = measureGlyphRunUnits(lineKeys, trackingUnits, glyphs, fallbackKey, spaceKey);
       const heightPx = m.height * scale;
       const top = bottom - heightPx;
       if (top < usableTop) return false;
@@ -287,14 +302,14 @@
       while (flat.length && isSpaceGlyphKey(flat[flat.length - 1], spaceKey)) flat.pop();
       linesRes = { ok: true, lines: [flat] };
     } else {
-      linesRes = wrapToLines(tokens, maxWidthUnits, trackingUnits, maxLines, group.breakLongWords, glyphs, spaceKey);
+      linesRes = wrapToLines(tokens, maxWidthUnits, trackingUnits, maxLines, group.breakLongWords, glyphs, fallbackKey, spaceKey);
       if (!linesRes.ok) return { ok: false, placements: [] };
     }
 
     const lines = linesRes.lines;
     // Must be placeable on fixed bottoms
     if (lines.length > bottomsPx.length) return { ok: false, placements: [] };
-    if (!linesFitFixedBottoms(lines, bottomsPx, area, padding, gapPx, scale, trackingUnits, glyphs, spaceKey)) {
+    if (!linesFitFixedBottoms(lines, bottomsPx, area, padding, gapPx, scale, trackingUnits, glyphs, fallbackKey, spaceKey)) {
       return { ok: false, placements: [] };
     }
 
@@ -305,7 +320,7 @@
       const bottom = bottomsPx[li];
 
       // Measure line width in units to align
-      const m = measureGlyphRunUnits(lineKeys, trackingUnits, glyphs, spaceKey);
+      const m = measureGlyphRunUnits(lineKeys, trackingUnits, glyphs, fallbackKey, spaceKey);
       const lineWidthPx = m.width * scale;
 
       let xStart;
@@ -321,7 +336,9 @@
 
       for (let gi = 0; gi < lineKeys.length; gi++) {
         const key = lineKeys[gi];
-        const g = glyphs[key] || glyphs[fallbackKey];
+        const entry = resolveGlyphEntry(key, glyphs, fallbackKey);
+        if (!entry) continue;
+        const g = entry.glyph;
 
         const x = xEdge + g.edges.L * scale;
         const y = bottom - g.edges.B * scale;
@@ -332,7 +349,7 @@
         // Render only if glyph has a path (space is empty)
         if (g.svg && g.svg.pathD) {
           placements.push({
-            key,
+            key: entry.key,
             x: finalX,
             y: finalY,
             s: scale,
@@ -387,7 +404,7 @@
       while (flat.length && isSpaceGlyphKey(flat[0], spaceKey)) flat.shift();
       while (flat.length && isSpaceGlyphKey(flat[flat.length - 1], spaceKey)) flat.pop();
 
-      const m = measureGlyphRunUnits(flat, trackingUnits, glyphs, spaceKey);
+      const m = measureGlyphRunUnits(flat, trackingUnits, glyphs, fallbackKey, spaceKey);
       const widthUnits = m.width;
       const heightUnits = m.height;
 
@@ -417,7 +434,7 @@
     while (flat.length && isSpaceGlyphKey(flat[0], spaceKey)) flat.shift();
     while (flat.length && isSpaceGlyphKey(flat[flat.length - 1], spaceKey)) flat.pop();
 
-    const m0 = measureGlyphRunUnits(flat, trackingUnits, glyphs, spaceKey);
+    const m0 = measureGlyphRunUnits(flat, trackingUnits, glyphs, fallbackKey, spaceKey);
     let hi = usableWpx / Math.max(1e-9, m0.width);
     // Also bound by vertical space to first bottom
     const bottom0 = bottomsPx[0] ?? group.originY;
@@ -471,9 +488,11 @@
     stage.appendChild(l);
   }
 
-  function buildDefs(stage, glyphs) {
+  function buildDefs(stage, glyphs, glyphKeys) {
     const defs = svgEl("defs");
-    for (const [key, g] of Object.entries(glyphs)) {
+    const keys = glyphKeys && glyphKeys.size ? Array.from(glyphKeys) : Object.keys(glyphs);
+    for (const key of keys) {
+      const g = glyphs[key];
       if (!g.svg || !g.svg.pathD) continue;
       const p = svgEl("path");
       p.setAttribute("id", key);
@@ -481,6 +500,54 @@
       defs.appendChild(p);
     }
     stage.appendChild(defs);
+  }
+
+  function collectReferencedGlyphKeys(groups, glyphs, fallbackKey, spaceKey) {
+    const keys = new Set();
+    keys.add(spaceKey);
+    if (hasRenderableGlyph(fallbackKey, glyphs)) keys.add(fallbackKey);
+    for (const group of (groups || [])) {
+      const tokens = tokenize(group.text || "", glyphs, fallbackKey, spaceKey);
+      for (const t of tokens) {
+        if (t.type === "newline") {
+          keys.add(spaceKey);
+          continue;
+        }
+        if (t.glyphKeys) {
+          for (const k of t.glyphKeys) keys.add(k);
+        }
+      }
+    }
+    return keys;
+  }
+
+  function verifyGlyphCoverage(groups, glyphs, fallbackKey, spaceKey) {
+    const missing = new Set();
+    const textKeys = new Set();
+
+    for (const group of (groups || [])) {
+      const text = normalizeText(group.text || "");
+      for (const ch of text) {
+        const normalized = ch === "\t" ? " " : ch;
+        if (normalized === "\n") {
+          textKeys.add(spaceKey);
+          continue;
+        }
+        textKeys.add(keyForChar(normalized));
+      }
+    }
+
+    textKeys.add(spaceKey);
+    if (hasRenderableGlyph(fallbackKey, glyphs)) textKeys.add(fallbackKey);
+
+    for (const key of textKeys) {
+      if (!hasRenderableGlyph(key, glyphs)) missing.add(key);
+    }
+
+    if (missing.size) {
+      const list = Array.from(missing).sort().join(", ");
+      console.warn(`[atlas-svg-renderer] Missing glyph svg.pathD for: ${list}. Using fallback where possible.`);
+    }
   }
 
   // Flatten text into a single glyph-run (newlines treated as spaces) and trim outer spaces.
@@ -505,7 +572,7 @@
     const keys = flattenGlyphKeysSingleLine(group.text || "", glyphs, fallbackKey, spaceKey);
     if (!keys.length) return { ok: false, placements: [] };
 
-    const m = measureGlyphRunUnits(keys, trackingUnits, glyphs, spaceKey);
+    const m = measureGlyphRunUnits(keys, trackingUnits, glyphs, fallbackKey, spaceKey);
     if (m.width <= 0 || m.height <= 0) return { ok: false, placements: [] };
 
     const availWpx = (area.right - area.left) - 2 * padding;
@@ -538,7 +605,9 @@
     let xEdge = xStart;
     for (let i = 0; i < keys.length; i++) {
       const key = keys[i];
-      const g = glyphs[key] || glyphs[fallbackKey];
+      const entry = resolveGlyphEntry(key, glyphs, fallbackKey);
+      if (!entry) continue;
+      const g = entry.glyph;
 
       const x = xEdge + g.edges.L * scale;
       const y = bottom - g.edges.B * scale;
@@ -548,7 +617,7 @@
 
       if (g.svg && g.svg.pathD) {
         placements.push({
-          key,
+          key: entry.key,
           x: finalX,
           y: finalY,
           s: scale,
@@ -790,8 +859,10 @@
     if (!stage) throw new Error("renderAtlasGroups: svgEl is required");
     if (!atlas || !atlas.glyphs) throw new Error("renderAtlasGroups: missing atlas data");
     const glyphs = atlas.glyphs;
-    const fallbackKey = "U003F"; // '?'
-    const spaceKey = "U0020";
+    const FALLBACK_KEY = "U003F"; // '?'
+    const SPACE_KEY = "U0020";
+    const fallbackKey = FALLBACK_KEY;
+    const spaceKey = SPACE_KEY;
 
     let resolvedViewBox = viewBoxSize;
     if (!resolvedViewBox || !Number.isFinite(resolvedViewBox.width) || !Number.isFinite(resolvedViewBox.height)) {
@@ -807,8 +878,10 @@
       stage.setAttribute("viewBox", `0 0 ${Math.max(1, resolvedViewBox.width)} ${Math.max(1, resolvedViewBox.height)}`);
     }
 
+    verifyGlyphCoverage(groups, glyphs, fallbackKey, spaceKey);
     clearStage(stage);
-    buildDefs(stage, glyphs);
+    const referencedKeys = collectReferencedGlyphKeys(groups, glyphs, fallbackKey, spaceKey);
+    buildDefs(stage, glyphs, referencedKeys);
 
     const opts = {
       stage,
